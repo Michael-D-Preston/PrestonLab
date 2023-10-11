@@ -1787,9 +1787,8 @@ BiocManager::install(&quot;dada2&quot;, version = &quot;3.17&quot;)
 <p>These are the packages you’ll need</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxubGlicmFyeShwaHlsb3NlcSlcbmxpYnJhcnkoZ2dwbG90MilcbmxpYnJhcnkoamFuaXRvcilcbmxpYnJhcnkoZHBseXIpXG5saWJyYXJ5KHRpZHl2ZXJzZSlcbmxpYnJhcnkoZ2dwdWJyKVxubGlicmFyeShhcGUpXG5saWJyYXJ5KGRhZGEyKVxuXG5gYGBcbmBgYCJ9 -->
-<pre class="r"><code>```r
-library(phyloseq)
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShwaHlsb3NlcSlcbmxpYnJhcnkoZ2dwbG90MilcbmxpYnJhcnkoamFuaXRvcilcbmxpYnJhcnkoZHBseXIpXG5saWJyYXJ5KHRpZHl2ZXJzZSlcbmxpYnJhcnkoZ2dwdWJyKVxubGlicmFyeShhcGUpXG5saWJyYXJ5KGRhZGEyKVxuXG5gYGAifQ== -->
+<pre class="r"><code>library(phyloseq)
 library(ggplot2)
 library(janitor)
 library(dplyr)
@@ -1798,86 +1797,119 @@ library(ggpubr)
 library(ape)
 library(dada2)
 </code></pre>
-<pre><code>
-&lt;!-- rnb-source-end --&gt;
-
-&lt;!-- rnb-chunk-end --&gt;
-
-
-&lt;!-- rnb-text-begin --&gt;
-
-
-Now its time to import our data from DATA2, unfortunately we need to work with a .csv file and our data come off in text files
-Fun fact: .csv files are just basic excel files
-
-To turn your text files into a .csv file open excel and then try to open your .txt file. Excel will go &quot;hey...&quot; and try to convert your txt file into an excel file. This is perfect! Our file is delimited (the autopicked option), via tab (the autopicked option after you click next once), so all you have to do is meander through the pop up and excel will do all the heavy lifting for you! Simply save your file as a .csv file where ever you&#39;d like!
-
-Now go off into to world and create a csv file of you 16S_R[name]_dada2_nochim_tax.txt file!
-Okay sweet, on the left should be a row of SV_0..Sv_10 ect, in the middle is you sample name with all the count data per species and on the right is tax.vector.
-
-Now unfortunately, tax.vector has to die, copy this column and put it into a txt file, and then delete the column from the CSV.
-
-Fun fact: backups! hey i&#39;ve noticed that you didn&#39;t immediately create a backup and a working csv file, Shame on you! Its important to always create backup files you NEVER modify in excel when you get a new file you plan on modifying. It&#39;d be a shame is you were to delete something you shouldn&#39;t have and then restart from the beginning. 
-
-You&#39;re 16S_R[name]_dada2_nochim_tax.csv file is now ready to be imported into R, but the txt file isn&#39;t
-
-This txt file is our &quot;taxonomy table&quot; name it as such (taxonomy_table.txt)
-Delete tax.vector and replace it with &quot;Kingdom,Phylum,Class,Order,Family,Genus,Species&quot; 
-Fun fact: delimited means to have fixed boundaries, remember how we were delimited by tabs in the previous txt/excel doc? We&#39;re gonna deliminate by commas in this file, why? because it makes life easier than tab; however it is arbitrary compared to space or semicolon for example (avoid space tho)
-
-Now we also have to separate all the taxon by commas; however the universe is kind and each taxon is separated by a colon. Therefore ctrl-H (find and replace) allows us to find &quot;:&quot; and replace with &quot;,&quot;
-
-Also every taxon has a label, like k__ (i.e. kingdom), or o__ (order), these are gross and if we don&#39;t remove them now they&#39;ll infect our finished product. find and replace all of them with find &quot;o__&quot; replace &quot;&quot; (its nothing haha)
-
-now we&#39;re done. Save this doc and turn it into a csv file as above but this time deliminate with commas
-
-
-finally, both tables are ready to be imported!
-
-
-&lt;!-- rnb-text-end --&gt;
-
-
-&lt;!-- rnb-chunk-begin --&gt;
-
-
-&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuTWV0YUdfMSA8LSByZWFkX2NzdihcIkM6XFxcXFVzZXJzXFxcXGFuZ3VzXFxcXE9uZURyaXZlIC0gVU5CQ1xcXFxBbmd1cyBCYWxsXFxcXExhYiB3b3JrXFxcXFVMVFJBXFxcXFRoZXkgY2FsbCBtZS4uLiBkYXRhXFxcXEFuZ3VzLTE2U1xcXFwxNlMtZGFkYTJfbm9jaGltX3RheC5jc3ZcIilcblRheF8xIDwtIHJlYWRfY3N2KFwiQzpcXFxcVXNlcnNcXFxcYW5ndXNcXFxcT25lRHJpdmUgLSBVTkJDXFxcXEFuZ3VzIEJhbGxcXFxcTGFiIHdvcmtcXFxcVUxUUkFcXFxcVGhleSBjYWxsIG1lLi4uIGRhdGFcXFxcQW5ndXMtMTZTXFxcXFRheG9ub215X3RhYmxlLmNzdlwiKVxuTWV0YUdfMiA8LSByZWFkX2NzdihcIkM6XFxcXFVzZXJzXFxcXGFuZ3VzXFxcXE9uZURyaXZlIC0gVU5CQ1xcXFxBbmd1cyBCYWxsXFxcXExhYiB3b3JrXFxcXFVMVFJBXFxcXFRoZXkgY2FsbCBtZS4uLiBkYXRhXFxcXEFuZ3VzLTE2U1xcXFxSZWRvbmUgbWFzdGVybWl4IHN0dWZmXFxcXDE2U19SZWZJbm9jdWx1bV9kYWRhMl9ub2NoaW1fdGF4LmNzdlwiKVxuVGF4XzIgPC0gcmVhZF9jc3YoXCJDOlxcXFxVc2Vyc1xcXFxhbmd1c1xcXFxPbmVEcml2ZSAtIFVOQkNcXFxcQW5ndXMgQmFsbFxcXFxMYWIgd29ya1xcXFxVTFRSQVxcXFxUaGV5IGNhbGwgbWUuLi4gZGF0YVxcXFxBbmd1cy0xNlNcXFxcUmVkb25lIG1hc3Rlcm1peCBzdHVmZlxcXFxUYXhvbm9teV90YWJsZS5jc3ZcIilcblxuXG5gYGAifQ== --&gt;
-
-```r
-MetaG_1 &lt;- read_csv(&quot;C:\\Users\\angus\\OneDrive - UNBC\\Angus Ball\\Lab work\\ULTRA\\They call me... data\\Angus-16S\\16S-dada2_nochim_tax.csv&quot;)
-Tax_1 &lt;- read_csv(&quot;C:\\Users\\angus\\OneDrive - UNBC\\Angus Ball\\Lab work\\ULTRA\\They call me... data\\Angus-16S\\Taxonomy_table.csv&quot;)
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Now its time to import our data from DATA2, unfortunately we need to
+work with a .csv file and our data come off in text files Fun fact: .csv
+files are just basic excel files</p>
+<p>To turn your text files into a .csv file open excel and then try to
+open your .txt file. Excel will go “hey…” and try to convert your txt
+file into an excel file. This is perfect! Our file is delimited (the
+autopicked option), via tab (the autopicked option after you click next
+once), so all you have to do is meander through the pop up and excel
+will do all the heavy lifting for you! Simply save your file as a .csv
+file where ever you’d like!</p>
+<p>Now go off into to world and create a csv file of you
+16S_R[name]_dada2_nochim_tax.txt file! Okay sweet, on the left should be
+a row of SV_0..Sv_10 ect, in the middle is you sample name with all the
+count data per species and on the right is tax.vector.</p>
+<p>Fun fact: backups! hey i’ve noticed that you didn’t immediately
+create a backup and a working csv file, Shame on you! Its important to
+always create backup files you NEVER modify in excel when you get a new
+file you plan on modifying. It’d be a shame is you were to delete
+something you shouldn’t have and then restart from the beginning.</p>
+<p>You’re 16S_R[name]_dada2_nochim_tax.csv file is now ready to be
+imported into R</p>
+<p>Lets import this table</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuTWV0YUdfMSA8LSByZWFkX2NzdihcIkM6XFxcXFVzZXJzXFxcXGFuZ3VzXFxcXE9uZURyaXZlIC0gVU5CQ1xcXFxBbmd1cyBCYWxsXFxcXExhYiB3b3JrXFxcXFVMVFJBXFxcXFRoZXkgY2FsbCBtZS4uLiBkYXRhXFxcXEFuZ3VzLTE2U1xcXFwxNlMtZGFkYTJfbm9jaGltX3RheC5jc3ZcIilcbk1ldGFHXzIgPC0gcmVhZF9jc3YoXCJDOlxcXFxVc2Vyc1xcXFxhbmd1c1xcXFxPbmVEcml2ZSAtIFVOQkNcXFxcQW5ndXMgQmFsbFxcXFxMYWIgd29ya1xcXFxVTFRSQVxcXFxUaGV5IGNhbGwgbWUuLi4gZGF0YVxcXFxBbmd1cy0xNlNcXFxcUmVkb25lIG1hc3Rlcm1peCBzdHVmZlxcXFwxNlNfUmVmSW5vY3VsdW1fZGFkYTJfbm9jaGltX3RheC5jc3ZcIilcblxuXG5gYGAifQ== -->
+<pre class="r"><code>MetaG_1 &lt;- read_csv(&quot;C:\\Users\\angus\\OneDrive - UNBC\\Angus Ball\\Lab work\\ULTRA\\They call me... data\\Angus-16S\\16S-dada2_nochim_tax.csv&quot;)
 MetaG_2 &lt;- read_csv(&quot;C:\\Users\\angus\\OneDrive - UNBC\\Angus Ball\\Lab work\\ULTRA\\They call me... data\\Angus-16S\\Redone mastermix stuff\\16S_RefInoculum_dada2_nochim_tax.csv&quot;)
-Tax_2 &lt;- read_csv(&quot;C:\\Users\\angus\\OneDrive - UNBC\\Angus Ball\\Lab work\\ULTRA\\They call me... data\\Angus-16S\\Redone mastermix stuff\\Taxonomy_table.csv&quot;)
 </code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>Congrats! We now have the data in R, you may have noticed I’ve
 actually read 2 separate sets of data, 1 and 2. You might not have two
-sets of data in which case just name your file MetaG_Master and
-Tax_Master respectively. We will then create phyloseq objects with both
+sets of data but I do!. We will then create phyloseq objects with both
 these datasets</p>
-<p>First things firt, we have to format the tables in a way that
-phyloseq is expecting them</p>
+<p>First things first, we have to format the tables in a way that
+phyloseq is expecting them and unfortunately, this is a bit of a pain.
+Phyloseq expects a couple tables. First a count table (this is the MetaG
+table), A taxonomy table (This is tax.vector), and a sample data table
+(This ones based off of the group of data that exist in your sample)</p>
+<p>Lets first start by creating the taxonomy table from the MetaG
+tables!</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuYGBgclxuI3JlbW92ZSB0aGUgc1YgdmFsdWVcbk1ldGFHXzEgPC0gc2VsZWN0KE1ldGFHXzEsIC0oMSkpXG4jTWV0YUdfMSA8LSBzZWxlY3QoTWV0YUdfMSwgLShcXHRheC52ZWN0b3JcXCkpXG5NZXRhR18yIDwtIHNlbGVjdChNZXRhR18yLCAtKDEpKVxuI01ldGFHXzIgPC0gc2VsZWN0KE1ldGFHXzIsIC0oXFx0YXgudmVjdG9yXFwpKVxuXG5gYGBcbmBgYFxuYGBgIn0= -->
-<pre class="r"><code>```r
-```r
-#remove the sV value
-MetaG_1 &lt;- select(MetaG_1, -(1))
-#MetaG_1 &lt;- select(MetaG_1, -(\tax.vector\))
-MetaG_2 &lt;- select(MetaG_2, -(1))
-#MetaG_2 &lt;- select(MetaG_2, -(\tax.vector\))
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuVGF4XzE8LXNlbGVjdChNZXRhR18xLCAoXCJ0YXgudmVjdG9yXCIpKSBcblRheF8yPC1zZWxlY3QoTWV0YUdfMiwgKFwidGF4LnZlY3RvclwiKSlcbmBgYCJ9 -->
+<pre class="r"><code>Tax_1&lt;-select(MetaG_1, (&quot;tax.vector&quot;)) 
+Tax_2&lt;-select(MetaG_2, (&quot;tax.vector&quot;))</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Oh bother! Phyloseq expects the taxonomy to be separated by taxons
+i.e. one column for kingdom, one for family ect. But everything is under
+one column. This means we have to deliminate again, and looking at the
+how to column is created from DADA2, we need to deliminate by colon</p>
+<p>cSplit deliminates within a column and then the rename functions make
+all the columns names phyloseq expects!</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuVGF4XzEgPC0gY1NwbGl0KFRheF8xLCBcInRheC52ZWN0b3JcIiwgXCI6XCIpXG5gYGAifQ== -->
+<pre class="r"><code>Tax_1 &lt;- cSplit(Tax_1, &quot;tax.vector&quot;, &quot;:&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiV2FybmluZzogJ2FzLmlzJyBzaG91bGQgYmUgc3BlY2lmaWVkIGJ5IHRoZSBjYWxsZXI7IHVzaW5nIFRSVUVXYXJuaW5nOiAnYXMuaXMnIHNob3VsZCBiZSBzcGVjaWZpZWQgYnkgdGhlIGNhbGxlcjsgdXNpbmcgVFJVRVdhcm5pbmc6ICdhcy5pcycgc2hvdWxkIGJlIHNwZWNpZmllZCBieSB0aGUgY2FsbGVyOyB1c2luZyBUUlVFV2FybmluZzogJ2FzLmlzJyBzaG91bGQgYmUgc3BlY2lmaWVkIGJ5IHRoZSBjYWxsZXI7IHVzaW5nIFRSVUVXYXJuaW5nOiAnYXMuaXMnIHNob3VsZCBiZSBzcGVjaWZpZWQgYnkgdGhlIGNhbGxlcjsgdXNpbmcgVFJVRVdhcm5pbmc6ICdhcy5pcycgc2hvdWxkIGJlIHNwZWNpZmllZCBieSB0aGUgY2FsbGVyOyB1c2luZyBUUlVFV2FybmluZzogJ2FzLmlzJyBzaG91bGQgYmUgc3BlY2lmaWVkIGJ5IHRoZSBjYWxsZXI7IHVzaW5nIFRSVUVcbiJ9 -->
+<pre><code>Warning: &#39;as.is&#39; should be specified by the caller; using TRUEWarning: &#39;as.is&#39; should be specified by the caller; using TRUEWarning: &#39;as.is&#39; should be specified by the caller; using TRUEWarning: &#39;as.is&#39; should be specified by the caller; using TRUEWarning: &#39;as.is&#39; should be specified by the caller; using TRUEWarning: &#39;as.is&#39; should be specified by the caller; using TRUEWarning: &#39;as.is&#39; should be specified by the caller; using TRUE</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuVGF4XzEgPC0gcmVuYW1lKFRheF8xLFxuIEtpbmdkb20gPSB0YXgudmVjdG9yXzEsXG4gUGh5bHVtID0gdGF4LnZlY3Rvcl8yLFxuIENsYXNzID0gdGF4LnZlY3Rvcl8zLFxuIE9yZGVyID0gdGF4LnZlY3Rvcl80LFxuIEZhbWlseSA9IHRheC52ZWN0b3JfNSxcbiBHZW51cyA9IHRheC52ZWN0b3JfNixcbiBTcGVjaWVzID0gdGF4LnZlY3Rvcl83LFxuICBcbiAgKVxuVGF4XzIgPC0gY1NwbGl0KFRheF8yLCBcInRheC52ZWN0b3JcIiwgXCI6XCIpXG5gYGAifQ== -->
+<pre class="r"><code>Tax_1 &lt;- rename(Tax_1,
+ Kingdom = tax.vector_1,
+ Phylum = tax.vector_2,
+ Class = tax.vector_3,
+ Order = tax.vector_4,
+ Family = tax.vector_5,
+ Genus = tax.vector_6,
+ Species = tax.vector_7,
+  
+  )
+Tax_2 &lt;- cSplit(Tax_2, &quot;tax.vector&quot;, &quot;:&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiV2FybmluZzogJ2FzLmlzJyBzaG91bGQgYmUgc3BlY2lmaWVkIGJ5IHRoZSBjYWxsZXI7IHVzaW5nIFRSVUVXYXJuaW5nOiAnYXMuaXMnIHNob3VsZCBiZSBzcGVjaWZpZWQgYnkgdGhlIGNhbGxlcjsgdXNpbmcgVFJVRVdhcm5pbmc6ICdhcy5pcycgc2hvdWxkIGJlIHNwZWNpZmllZCBieSB0aGUgY2FsbGVyOyB1c2luZyBUUlVFV2FybmluZzogJ2FzLmlzJyBzaG91bGQgYmUgc3BlY2lmaWVkIGJ5IHRoZSBjYWxsZXI7IHVzaW5nIFRSVUVXYXJuaW5nOiAnYXMuaXMnIHNob3VsZCBiZSBzcGVjaWZpZWQgYnkgdGhlIGNhbGxlcjsgdXNpbmcgVFJVRVdhcm5pbmc6ICdhcy5pcycgc2hvdWxkIGJlIHNwZWNpZmllZCBieSB0aGUgY2FsbGVyOyB1c2luZyBUUlVFV2FybmluZzogJ2FzLmlzJyBzaG91bGQgYmUgc3BlY2lmaWVkIGJ5IHRoZSBjYWxsZXI7IHVzaW5nIFRSVUVcbiJ9 -->
+<pre><code>Warning: &#39;as.is&#39; should be specified by the caller; using TRUEWarning: &#39;as.is&#39; should be specified by the caller; using TRUEWarning: &#39;as.is&#39; should be specified by the caller; using TRUEWarning: &#39;as.is&#39; should be specified by the caller; using TRUEWarning: &#39;as.is&#39; should be specified by the caller; using TRUEWarning: &#39;as.is&#39; should be specified by the caller; using TRUEWarning: &#39;as.is&#39; should be specified by the caller; using TRUE</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuVGF4XzIgPC0gcmVuYW1lKFRheF8yLFxuIEtpbmdkb20gPSB0YXgudmVjdG9yXzEsXG4gUGh5bHVtID0gdGF4LnZlY3Rvcl8yLFxuIENsYXNzID0gdGF4LnZlY3Rvcl8zLFxuIE9yZGVyID0gdGF4LnZlY3Rvcl80LFxuIEZhbWlseSA9IHRheC52ZWN0b3JfNSxcbiBHZW51cyA9IHRheC52ZWN0b3JfNixcbiBTcGVjaWVzID0gdGF4LnZlY3Rvcl83LFxuICBcbiAgKVxuXG5cbmBgYCJ9 -->
+<pre class="r"><code>Tax_2 &lt;- rename(Tax_2,
+ Kingdom = tax.vector_1,
+ Phylum = tax.vector_2,
+ Class = tax.vector_3,
+ Order = tax.vector_4,
+ Family = tax.vector_5,
+ Genus = tax.vector_6,
+ Species = tax.vector_7,
+  
+  )
 </code></pre>
-<pre><code></code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI3JlbW92ZSB0aGUgc1YgdmFsdWVcbk1ldGFHXzEgPC0gc2VsZWN0KE1ldGFHXzEsIC0oMSkpXG5NZXRhR18xIDwtIHNlbGVjdChNZXRhR18xLCAtKFwidGF4LnZlY3RvclwiKSlcbk1ldGFHXzIgPC0gc2VsZWN0KE1ldGFHXzIsIC0oMSkpXG5NZXRhR18yIDwtIHNlbGVjdChNZXRhR18yLCAtKFwidGF4LnZlY3RvclwiKSlcblxuYGBgIn0= -->
+<pre class="r"><code>#remove the sV value
+MetaG_1 &lt;- select(MetaG_1, -(1))
+MetaG_1 &lt;- select(MetaG_1, -(&quot;tax.vector&quot;))
+MetaG_2 &lt;- select(MetaG_2, -(1))
+MetaG_2 &lt;- select(MetaG_2, -(&quot;tax.vector&quot;))
+</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>What we did was remove the first column (column “1”) from the data
-set, i’ve also included the code to remove the tax.vector column here
-(but you’ve been paying attention earlier and already removed it, so we
-haven’t included it)</p>
+set, i’ve also included the code to remove the tax.vector column
+here</p>
 <p>Now this is real data, and for paper reasons I want to remove some
 samples from MetaG_1. We can use a similar compand to do this</p>
 <!-- rnb-text-end -->
@@ -1887,6 +1919,56 @@ samples from MetaG_1. We can use a similar compand to do this</p>
 MetaG_1 &lt;- select(MetaG_1, -(&quot;CHB1P1&quot;:&quot;FNP9B3&quot;))
 </code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>We have to take our tables (that exist as a dataframe) and convert
+them into a maxtrix, why? because the phyloseq class uses matrixes and
+not dataframes (in the example above we couldn’t feed our class two int
+values, it wants and int and a char!)</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI25vdyByZWFsIHN0dWZmXG4jY29udmVydCB0aGVzZSBiYWQgYm95cyB0byBtYXRyaXhlc1xuVGF4XzEgPC0gYXMubWF0cml4KFRheF8xKVxuTWV0YUdfMSA8LSBhcy5tYXRyaXgoTWV0YUdfMSlcblxuVGF4XzIgPC0gYXMubWF0cml4KFRheF8yKVxuTWV0YUdfMiA8LSBhcy5tYXRyaXgoTWV0YUdfMilcblxuYGBgIn0= -->
+<pre class="r"><code>#now real stuff
+#convert these bad boys to matrixes
+Tax_1 &lt;- as.matrix(Tax_1)
+MetaG_1 &lt;- as.matrix(MetaG_1)
+
+Tax_2 &lt;- as.matrix(Tax_2)
+MetaG_2 &lt;- as.matrix(MetaG_2)
+</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>You can check the class of the objects with a simple command (oh yes
+the tables have been objects all along, we’re creating objects within
+classes within classes! neat isnt it?)</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI2NoZWNrXG5jbGFzcyhUYXhfMSlcbmBgYCJ9 -->
+<pre class="r"><code>#check
+class(Tax_1)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwibWF0cml4XCIgXCJhcnJheVwiIFxuIn0= -->
+<pre><code>[1] &quot;matrix&quot; &quot;array&quot; </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY2xhc3MoTWV0YUdfMSlcbmBgYCJ9 -->
+<pre class="r"><code>class(MetaG_1)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwibWF0cml4XCIgXCJhcnJheVwiIFxuIn0= -->
+<pre><code>[1] &quot;matrix&quot; &quot;array&quot; </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY2xhc3MoVGF4XzIpXG5gYGAifQ== -->
+<pre class="r"><code>class(Tax_2)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwibWF0cml4XCIgXCJhcnJheVwiIFxuIn0= -->
+<pre><code>[1] &quot;matrix&quot; &quot;array&quot; </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY2xhc3MoTWV0YUdfMilcbmBgYCJ9 -->
+<pre class="r"><code>class(MetaG_2)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwibWF0cml4XCIgXCJhcnJheVwiIFxuIn0= -->
+<pre><code>[1] &quot;matrix&quot; &quot;array&quot; </code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>Phyloseq expects the far left column to be called OTU, this is how to
@@ -1920,46 +2002,14 @@ subtly and complexity of the system (re: go read the first couple
 chapters of a java textbook), but alas.</p>
 <p>So now lets say you wanted a thing, lets call it a class, that
 contained a number and a character, you could create a class that used x
-and it used y to create an object. This is a poor explination that has
+and it used y to create an object. This is a poor explanation that has
 likely made several computer scientists sad but whatever, phyloseq is a
 class that creates phyloseq objects, each object having at a minimum an
-abundance table (metaG_) and a taxonomy table (Tax_). Excelent you are
-now equally confused as earlier but I feel like I’ve done my
-dudillegence, onward.</p>
-<p>We have to take our tables (that exist as a dataframe) and convert
-them into a maxtrix, why? because the phyloseq class uses matrixes and
-not dataframes (in the example above we couldn’t feed our class two int
-values, it wants and int and a char!)</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI25vdyByZWFsIHN0dWZmXG4jY29udmVydCB0aGVzZSBiYWQgYm95cyB0byBtYXRyaXhlc1xuVGF4XzEgPC0gYXMubWF0cml4KFRheF8xKVxuTWV0YUdfMSA8LSBhcy5tYXRyaXgoTWV0YUdfMSlcblxuVGF4XzIgPC0gYXMubWF0cml4KFRheF8yKVxuTWV0YUdfMiA8LSBhcy5tYXRyaXgoTWV0YUdfMilcblxuYGBgIn0= -->
-<pre class="r"><code>#now real stuff
-#convert these bad boys to matrixes
-Tax_1 &lt;- as.matrix(Tax_1)
-MetaG_1 &lt;- as.matrix(MetaG_1)
-
-Tax_2 &lt;- as.matrix(Tax_2)
-MetaG_2 &lt;- as.matrix(MetaG_2)
-</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>You can check the class of the objects with a simple command (oh yes
-the tables have been objects all along, we’re creating objects within
-classes within classes! neat isnt it?)</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI2NoZWNrXG5jbGFzcyhUYXhfMSlcbmNsYXNzKE1ldGFHXzEpXG5jbGFzcyhUYXhfMilcbmNsYXNzKE1ldGFHXzIpXG5gYGAifQ== -->
-<pre class="r"><code>#check
-class(Tax_1)
-class(MetaG_1)
-class(Tax_2)
-class(MetaG_2)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Now phyloseq wants us to turn these matrices into a different
-class</p>
+abundance table (metaG_) and a taxonomy table (Tax_). Excellent you are
+now equally confused as earlier but I feel like I’ve done my due
+dillegence, onward.</p>
+<p>Now phyloseq wants us to turn these matrices into a different class
+created by phyloseq (not isnt a phyloseq object yet)</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG5PVFVfMSA9IG90dV90YWJsZShNZXRhR18xLCB0YXhhX2FyZV9yb3dzID0gVFJVRSlcblRBWF8xID0gdGF4X3RhYmxlKFRheF8xKVxuXG5PVFVfMiA9IG90dV90YWJsZShNZXRhR18yLCB0YXhhX2FyZV9yb3dzID0gVFJVRSlcblRBWF8yID0gdGF4X3RhYmxlKFRheF8yKVxuYGBgIn0= -->
@@ -1994,14 +2044,16 @@ samples</p>
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>Now we have to conglomerate our data so that OTUs specifying the same
-thing are combined. This code destorys the species level comparision and
+thing are combined. This code destroys the species level comparison and
 says if it exists within this family add it to total family value If you
 are working on a species level comparison do not do this as it will not
-work; however, for this data set we are looking on an order and family
-level so it does not lose data. There are better ways to merge data but
-those are done within the dada2 pipeline before taxonomy assignment, I
-did not do dada2 analysis on these samples and therefore i have to do
-this (poorer) way of merging samples.</p>
+let you work on species level comparisons; however, for this data set we
+are looking on an order and family level so it does not lose
+sensitivity. There are better ways to merge data but those are done
+within the dada2 pipeline before taxonomy assignment, I did not do dada2
+analysis on these samples and therefore i have to do this (poorer) way
+of merging samples. Maybe I’ll find a better way to do it later, If you
+do tell me.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucGh5c2VxIDwtIHRheF9nbG9tKHBoeXNlcSwgdGF4cmFuayA9IHJhbmtfbmFtZXMocGh5c2VxKVs1XSwgTkFybSA9IEZBTFNFKVxuYGBgIn0= -->
@@ -2037,14 +2089,22 @@ names mean ask to read my manuscript but we must import this
 metadata.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuS2V5IDwtIHJlYWRfY3N2KFwiQzpcXFxcVXNlcnNcXFxcYWJhbGxcXFxcT25lRHJpdmUgLSBVTkJDXFxcXEFuZ3VzIEJhbGxcXFxcTGFiIHdvcmtcXFxcVUxUUkFcXFxcVGhleSBjYWxsIG1lLi4uIGRhdGFcXFxcQW5ndXMtMTZTXFxcXHVsdHJhIHRvIGNhdGVnb3JpZXMga2V5LmNzdlwiKVxuYGBgIn0= -->
-<pre class="r"><code>Key &lt;- read_csv(&quot;C:\\Users\\aball\\OneDrive - UNBC\\Angus Ball\\Lab work\\ULTRA\\They call me... data\\Angus-16S\\ultra to categories key.csv&quot;)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuS2V5IDwtIHJlYWRfY3N2KFwiQzpcXFxcVXNlcnNcXFxcYW5ndXNcXFxcT25lRHJpdmUgLSBVTkJDXFxcXEFuZ3VzIEJhbGxcXFxcTGFiIHdvcmtcXFxcVUxUUkFcXFxcVGhleSBjYWxsIG1lLi4uIGRhdGFcXFxcQW5ndXMtMTZTXFxcXHVsdHJhIHRvIGNhdGVnb3JpZXMga2V5LmNzdlwiKVxuYGBgIn0= -->
+<pre class="r"><code>Key &lt;- read_csv(&quot;C:\\Users\\angus\\OneDrive - UNBC\\Angus Ball\\Lab work\\ULTRA\\They call me... data\\Angus-16S\\ultra to categories key.csv&quot;)</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiUm93czogNTIgQ29sdW1uczogNeKUgOKUgCBDb2x1bW4gc3BlY2lmaWNhdGlvbiDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIBcbkRlbGltaXRlcjogXCIsXCJcbmNociAoNCk6IE5hbWUsIEFtZCwgRmVydGFsaXplZCwgSW5vY3VsdW1cbmRibCAoMSk6IENvbmNcbuKEuSBVc2UgYHNwZWMoKWAgdG8gcmV0cmlldmUgdGhlIGZ1bGwgY29sdW1uIHNwZWNpZmljYXRpb24gZm9yIHRoaXMgZGF0YS5cbuKEuSBTcGVjaWZ5IHRoZSBjb2x1bW4gdHlwZXMgb3Igc2V0IGBzaG93X2NvbF90eXBlcyA9IEZBTFNFYCB0byBxdWlldCB0aGlzIG1lc3NhZ2UuXG4ifQ== -->
+<pre><code>Rows: 52 Columns: 5── Column specification ───────────────────────────────────────────────────────────────────────────────
+Delimiter: &quot;,&quot;
+chr (4): Name, Amd, Fertalized, Inoculum
+dbl (1): Conc
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>if you explore this document, you’ll realize it has all the samples
-in order they appear on column names with the meta data in other
-columns</p>
+in order they appear on column names within the MetaG table, but they
+are in the rows instead. The meta data in other columns</p>
 <p>for the same reasons we converted to OTU earlier (phyloseq being
 fickle), we have to make the sample names be the left most row name</p>
 <!-- rnb-text-end -->
@@ -2067,7 +2127,7 @@ sampledata = sample_data(Key)</code></pre>
 move on to transformations and data analysis</p>
 <!-- rnb-text-end -->
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIkltcG9ydGluZyBkYXRhIGZyb20gREFEQTIgdmlhIFBoeWxvc2VxIg0Kb3V0cHV0OiBodG1sX25vdGVib29rDQotLS0NCg0KDQpIaSwgYnkgbm93IHlvdSd2ZSBwcm9jZXNzZWQgeW91ciBkYXRhIHRocm91Z2ggREFEQTIgYW5kIG5vdyBpdHMgdGltZSBmb3Igc29tZSBkYXRhIGFuYWx5c2lzISEhIGhhaGEgc2lrZSwgd2UgaGF2ZSB0byBmb3JtYXQgaXQgZmlyc3QsIGdldCByZWt0DQoNCkJpb21hbmFnZXIgaXMgYSBuYW1lIHRoYXRzIGdvbm5hIGNvbWUgdXAgYWxvdCwgYnV0IHdoYXQgaXMgYmlvbWFuYWdlcj8gd2VsbCBpdHMgYWN0dWFsbHkgY2FsbGVkIGJpb2NvbmR1Y3RvciAobG92ZSB0aGUgbmFtaW5nIHNjaGVtZSksIGFuZCBpdHMgYSBkYXRhYmFzZSB3aXRoIGFsbCB0aGUgYmlnIGJveXMgaW4gYmlvaW5mb3JtYXRpY3Mgc29mdHdhcmUsIHNvIHdoZW4gd2Ugd2FudCB0byB1c2Ugc3BlY2lmaWMgcGFja2FnZXMgd2UnbGwgaGF2ZSB0byBpbnN0YWxsIHRoZW0gZGlyZWN0bHkgZnJvbSBiaW9tYW5hZ2VyLiANCg0KVGhpcyBpcyBob3cgdG8gZG8gdGhhdDoNCmBgYHtyLCBlY2hvID0gVCwgbWVzc2FnZT1GQUxTRX0NCg0KDQojcGh5bG9zZXEgYW5kIGJpb21hbmFnZXINCmlmICghcmVxdWlyZSgiQmlvY01hbmFnZXIiLCBxdWlldGx5ID0gVFJVRSkpDQppbnN0YWxsLnBhY2thZ2VzKCJCaW9jTWFuYWdlciIpDQpCaW9jTWFuYWdlcjo6aW5zdGFsbCgpDQpCaW9jTWFuYWdlcjo6aW5zdGFsbChjKCJwaHlsb3NlcSIpKQ0KDQojbWljcm9iaW9tZU1ha2VyDQppZiAoIXJlcXVpcmVOYW1lc3BhY2UoIkJpb2NNYW5hZ2VyIiwgcXVpZXRseSA9IFRSVUUpKQ0KICBpbnN0YWxsLnBhY2thZ2VzKCJCaW9jTWFuYWdlciIpDQpCaW9jTWFuYWdlcjo6aW5zdGFsbCgibWljcm9iaW9tZU1hcmtlciIpDQojZGFkYTINCmlmICghcmVxdWlyZU5hbWVzcGFjZSgiQmlvY01hbmFnZXIiLCBxdWlldGx5ID0gVFJVRSkpDQogICAgaW5zdGFsbC5wYWNrYWdlcygiQmlvY01hbmFnZXIiKQ0KQmlvY01hbmFnZXI6Omluc3RhbGwoImRhZGEyIiwgdmVyc2lvbiA9ICIzLjE3IikNCg0KYGBgDQoNCg0KDQoNClRoZXNlIGFyZSB0aGUgcGFja2FnZXMgeW91J2xsIG5lZWQNCmBgYHtyLCBlY2hvID0gVCwgbWVzc2FnZT1GQUxTRX0NCmxpYnJhcnkocGh5bG9zZXEpDQpsaWJyYXJ5KGdncGxvdDIpDQpsaWJyYXJ5KGphbml0b3IpDQpsaWJyYXJ5KGRwbHlyKQ0KbGlicmFyeSh0aWR5dmVyc2UpDQpsaWJyYXJ5KGdncHVicikNCmxpYnJhcnkoYXBlKQ0KbGlicmFyeShkYWRhMikNCg0KYGBgDQoNCk5vdyBpdHMgdGltZSB0byBpbXBvcnQgb3VyIGRhdGEgZnJvbSBEQVRBMiwgdW5mb3J0dW5hdGVseSB3ZSBuZWVkIHRvIHdvcmsgd2l0aCBhIC5jc3YgZmlsZSBhbmQgb3VyIGRhdGEgY29tZSBvZmYgaW4gdGV4dCBmaWxlcw0KRnVuIGZhY3Q6IC5jc3YgZmlsZXMgYXJlIGp1c3QgYmFzaWMgZXhjZWwgZmlsZXMNCg0KVG8gdHVybiB5b3VyIHRleHQgZmlsZXMgaW50byBhIC5jc3YgZmlsZSBvcGVuIGV4Y2VsIGFuZCB0aGVuIHRyeSB0byBvcGVuIHlvdXIgLnR4dCBmaWxlLiBFeGNlbCB3aWxsIGdvICJoZXkuLi4iIGFuZCB0cnkgdG8gY29udmVydCB5b3VyIHR4dCBmaWxlIGludG8gYW4gZXhjZWwgZmlsZS4gVGhpcyBpcyBwZXJmZWN0ISBPdXIgZmlsZSBpcyBkZWxpbWl0ZWQgKHRoZSBhdXRvcGlja2VkIG9wdGlvbiksIHZpYSB0YWIgKHRoZSBhdXRvcGlja2VkIG9wdGlvbiBhZnRlciB5b3UgY2xpY2sgbmV4dCBvbmNlKSwgc28gYWxsIHlvdSBoYXZlIHRvIGRvIGlzIG1lYW5kZXIgdGhyb3VnaCB0aGUgcG9wIHVwIGFuZCBleGNlbCB3aWxsIGRvIGFsbCB0aGUgaGVhdnkgbGlmdGluZyBmb3IgeW91ISBTaW1wbHkgc2F2ZSB5b3VyIGZpbGUgYXMgYSAuY3N2IGZpbGUgd2hlcmUgZXZlciB5b3UnZCBsaWtlIQ0KDQpOb3cgZ28gb2ZmIGludG8gdG8gd29ybGQgYW5kIGNyZWF0ZSBhIGNzdiBmaWxlIG9mIHlvdSAxNlNfUltuYW1lXV9kYWRhMl9ub2NoaW1fdGF4LnR4dCBmaWxlIQ0KT2theSBzd2VldCwgb24gdGhlIGxlZnQgc2hvdWxkIGJlIGEgcm93IG9mIFNWXzAuLlN2XzEwIGVjdCwgaW4gdGhlIG1pZGRsZSBpcyB5b3Ugc2FtcGxlIG5hbWUgd2l0aCBhbGwgdGhlIGNvdW50IGRhdGEgcGVyIHNwZWNpZXMgYW5kIG9uIHRoZSByaWdodCBpcyB0YXgudmVjdG9yLg0KDQpOb3cgdW5mb3J0dW5hdGVseSwgdGF4LnZlY3RvciBoYXMgdG8gZGllLCBjb3B5IHRoaXMgY29sdW1uIGFuZCBwdXQgaXQgaW50byBhIHR4dCBmaWxlLCBhbmQgdGhlbiBkZWxldGUgdGhlIGNvbHVtbiBmcm9tIHRoZSBDU1YuDQoNCkZ1biBmYWN0OiBiYWNrdXBzISBoZXkgaSd2ZSBub3RpY2VkIHRoYXQgeW91IGRpZG4ndCBpbW1lZGlhdGVseSBjcmVhdGUgYSBiYWNrdXAgYW5kIGEgd29ya2luZyBjc3YgZmlsZSwgU2hhbWUgb24geW91ISBJdHMgaW1wb3J0YW50IHRvIGFsd2F5cyBjcmVhdGUgYmFja3VwIGZpbGVzIHlvdSBORVZFUiBtb2RpZnkgaW4gZXhjZWwgd2hlbiB5b3UgZ2V0IGEgbmV3IGZpbGUgeW91IHBsYW4gb24gbW9kaWZ5aW5nLiBJdCdkIGJlIGEgc2hhbWUgaXMgeW91IHdlcmUgdG8gZGVsZXRlIHNvbWV0aGluZyB5b3Ugc2hvdWxkbid0IGhhdmUgYW5kIHRoZW4gcmVzdGFydCBmcm9tIHRoZSBiZWdpbm5pbmcuIA0KDQpZb3UncmUgMTZTX1JbbmFtZV1fZGFkYTJfbm9jaGltX3RheC5jc3YgZmlsZSBpcyBub3cgcmVhZHkgdG8gYmUgaW1wb3J0ZWQgaW50byBSLCBidXQgdGhlIHR4dCBmaWxlIGlzbid0DQoNClRoaXMgdHh0IGZpbGUgaXMgb3VyICJ0YXhvbm9teSB0YWJsZSIgbmFtZSBpdCBhcyBzdWNoICh0YXhvbm9teV90YWJsZS50eHQpDQpEZWxldGUgdGF4LnZlY3RvciBhbmQgcmVwbGFjZSBpdCB3aXRoICJLaW5nZG9tLFBoeWx1bSxDbGFzcyxPcmRlcixGYW1pbHksR2VudXMsU3BlY2llcyIgDQpGdW4gZmFjdDogZGVsaW1pdGVkIG1lYW5zIHRvIGhhdmUgZml4ZWQgYm91bmRhcmllcywgcmVtZW1iZXIgaG93IHdlIHdlcmUgZGVsaW1pdGVkIGJ5IHRhYnMgaW4gdGhlIHByZXZpb3VzIHR4dC9leGNlbCBkb2M/IFdlJ3JlIGdvbm5hIGRlbGltaW5hdGUgYnkgY29tbWFzIGluIHRoaXMgZmlsZSwgd2h5PyBiZWNhdXNlIGl0IG1ha2VzIGxpZmUgZWFzaWVyIHRoYW4gdGFiOyBob3dldmVyIGl0IGlzIGFyYml0cmFyeSBjb21wYXJlZCB0byBzcGFjZSBvciBzZW1pY29sb24gZm9yIGV4YW1wbGUgKGF2b2lkIHNwYWNlIHRobykNCg0KTm93IHdlIGFsc28gaGF2ZSB0byBzZXBhcmF0ZSBhbGwgdGhlIHRheG9uIGJ5IGNvbW1hczsgaG93ZXZlciB0aGUgdW5pdmVyc2UgaXMga2luZCBhbmQgZWFjaCB0YXhvbiBpcyBzZXBhcmF0ZWQgYnkgYSBjb2xvbi4gVGhlcmVmb3JlIGN0cmwtSCAoZmluZCBhbmQgcmVwbGFjZSkgYWxsb3dzIHVzIHRvIGZpbmQgIjoiIGFuZCByZXBsYWNlIHdpdGggIiwiDQoNCkFsc28gZXZlcnkgdGF4b24gaGFzIGEgbGFiZWwsIGxpa2Uga19fIChpLmUuIGtpbmdkb20pLCBvciBvX18gKG9yZGVyKSwgdGhlc2UgYXJlIGdyb3NzIGFuZCBpZiB3ZSBkb24ndCByZW1vdmUgdGhlbSBub3cgdGhleSdsbCBpbmZlY3Qgb3VyIGZpbmlzaGVkIHByb2R1Y3QuIGZpbmQgYW5kIHJlcGxhY2UgYWxsIG9mIHRoZW0gd2l0aCBmaW5kICJvX18iIHJlcGxhY2UgIiIgKGl0cyBub3RoaW5nIGhhaGEpDQoNCm5vdyB3ZSdyZSBkb25lLiBTYXZlIHRoaXMgZG9jIGFuZCB0dXJuIGl0IGludG8gYSBjc3YgZmlsZSBhcyBhYm92ZSBidXQgdGhpcyB0aW1lIGRlbGltaW5hdGUgd2l0aCBjb21tYXMNCg0KDQpmaW5hbGx5LCBib3RoIHRhYmxlcyBhcmUgcmVhZHkgdG8gYmUgaW1wb3J0ZWQhDQoNCmBgYHtyLCBlY2hvID0gVCwgbWVzc2FnZT1GQUxTRX0NCk1ldGFHXzEgPC0gcmVhZF9jc3YoIkM6XFxVc2Vyc1xcYW5ndXNcXE9uZURyaXZlIC0gVU5CQ1xcQW5ndXMgQmFsbFxcTGFiIHdvcmtcXFVMVFJBXFxUaGV5IGNhbGwgbWUuLi4gZGF0YVxcQW5ndXMtMTZTXFwxNlMtZGFkYTJfbm9jaGltX3RheC5jc3YiKQ0KVGF4XzEgPC0gcmVhZF9jc3YoIkM6XFxVc2Vyc1xcYW5ndXNcXE9uZURyaXZlIC0gVU5CQ1xcQW5ndXMgQmFsbFxcTGFiIHdvcmtcXFVMVFJBXFxUaGV5IGNhbGwgbWUuLi4gZGF0YVxcQW5ndXMtMTZTXFxUYXhvbm9teV90YWJsZS5jc3YiKQ0KTWV0YUdfMiA8LSByZWFkX2NzdigiQzpcXFVzZXJzXFxhbmd1c1xcT25lRHJpdmUgLSBVTkJDXFxBbmd1cyBCYWxsXFxMYWIgd29ya1xcVUxUUkFcXFRoZXkgY2FsbCBtZS4uLiBkYXRhXFxBbmd1cy0xNlNcXFJlZG9uZSBtYXN0ZXJtaXggc3R1ZmZcXDE2U19SZWZJbm9jdWx1bV9kYWRhMl9ub2NoaW1fdGF4LmNzdiIpDQpUYXhfMiA8LSByZWFkX2NzdigiQzpcXFVzZXJzXFxhbmd1c1xcT25lRHJpdmUgLSBVTkJDXFxBbmd1cyBCYWxsXFxMYWIgd29ya1xcVUxUUkFcXFRoZXkgY2FsbCBtZS4uLiBkYXRhXFxBbmd1cy0xNlNcXFJlZG9uZSBtYXN0ZXJtaXggc3R1ZmZcXFRheG9ub215X3RhYmxlLmNzdiIpDQoNCg0KYGBgDQoNCkNvbmdyYXRzISBXZSBub3cgaGF2ZSB0aGUgZGF0YSBpbiBSLCB5b3UgbWF5IGhhdmUgbm90aWNlZCBJJ3ZlIGFjdHVhbGx5IHJlYWQgMiBzZXBhcmF0ZSBzZXRzIG9mIGRhdGEsIDEgYW5kIDIuIFlvdSBtaWdodCBub3QgaGF2ZSB0d28gc2V0cyBvZiBkYXRhIGluIHdoaWNoIGNhc2UganVzdCBuYW1lIHlvdXIgZmlsZSBNZXRhR19NYXN0ZXIgYW5kIFRheF9NYXN0ZXIgcmVzcGVjdGl2ZWx5LiBXZSB3aWxsIHRoZW4gY3JlYXRlIHBoeWxvc2VxIG9iamVjdHMgd2l0aCBib3RoIHRoZXNlIGRhdGFzZXRzDQoNCg0KRmlyc3QgdGhpbmdzIGZpcnQsIHdlIGhhdmUgdG8gZm9ybWF0IHRoZSB0YWJsZXMgaW4gYSB3YXkgdGhhdCBwaHlsb3NlcSBpcyBleHBlY3RpbmcgdGhlbQ0KYGBge3J9DQojcmVtb3ZlIHRoZSBzViB2YWx1ZQ0KTWV0YUdfMSA8LSBzZWxlY3QoTWV0YUdfMSwgLSgxKSkNCk1ldGFHXzEgPC0gc2VsZWN0KE1ldGFHXzEsIC0oInRheC52ZWN0b3IiKSkNCk1ldGFHXzIgPC0gc2VsZWN0KE1ldGFHXzIsIC0oMSkpDQojTWV0YUdfMiA8LSBzZWxlY3QoTWV0YUdfMiwgLSgidGF4LnZlY3RvciIpKQ0KDQpgYGANCldoYXQgd2UgZGlkIHdhcyByZW1vdmUgdGhlIGZpcnN0IGNvbHVtbiAoY29sdW1uICIxIikgZnJvbSB0aGUgZGF0YSBzZXQsIGkndmUgYWxzbyBpbmNsdWRlZCB0aGUgY29kZSB0byByZW1vdmUgdGhlIHRheC52ZWN0b3IgY29sdW1uIGhlcmUgKGJ1dCB5b3UndmUgYmVlbiBwYXlpbmcgYXR0ZW50aW9uIGVhcmxpZXIgYW5kIGFscmVhZHkgcmVtb3ZlZCBpdCwgc28gd2UgaGF2ZW4ndCBpbmNsdWRlZCBpdCkNCg0KTm93IHRoaXMgaXMgcmVhbCBkYXRhLCBhbmQgZm9yIHBhcGVyIHJlYXNvbnMgSSB3YW50IHRvIHJlbW92ZSBzb21lIHNhbXBsZXMgZnJvbSBNZXRhR18xLiBXZSBjYW4gdXNlIGEgc2ltaWxhciBjb21wYW5kIHRvIGRvIHRoaXMNCmBgYHtyfQ0KI1VMVFJBDQpNZXRhR18xIDwtIHNlbGVjdChNZXRhR18xLCAtKCJDSEIxUDEiOiJGTlA5QjMiKSkNCg0KYGBgDQoNClBoeWxvc2VxIGV4cGVjdHMgdGhlIGZhciBsZWZ0IGNvbHVtbiB0byBiZSBjYWxsZWQgT1RVLCB0aGlzIGlzIGhvdyB0byBkbyBpdCwgSSdtIG5hbWluZyB0aGUgT1RVcyAxIGFuZCAyIGJlY2F1c2Ugb2YgaG93IHBoeWxvc2VxIG1lcmdlcyByb3cgbmFtZXMgbGF0ZXIgb24NCmBgYHtyfQ0KI2NhbGwgcm93IHZhbHVlcyBPVFUNCnJvd25hbWVzKE1ldGFHXzEpIDwtIHBhc3RlMCgiT1RVIiwgMTpucm93KE1ldGFHXzEpKQ0Kcm93bmFtZXMoVGF4XzEpIDwtIHBhc3RlMCgiT1RVIiwgMTpucm93KFRheF8xKSkNCg0Kcm93bmFtZXMoTWV0YUdfMikgPC0gcGFzdGUwKCIyX09UVSIsIDE6bnJvdyhNZXRhR18yKSkNCnJvd25hbWVzKFRheF8yKSA8LSBwYXN0ZTAoIjJfT1RVIiwgMTpucm93KFRheF8yKSkNCg0KYGBgDQpWZXJ5IHNjYXJ5IGxvb2tpbmcgbWVzc2FnZSwgYnV0IGl0IG9ubHkgcmVhZHMgdGhhdCB3ZSBkZWxldGVkIGFuZCByZXBsYWNlZCB0aGUgcHJldmlvdXMgcm93IG5hbWVzDQoNCk9rYXkgaG9wZWZ1bGx5IHlvdSBrbm93IGEgYml0IGFib3V0IG9iamVjdHMvY2xhc3NlcywgaWYgbm90DQpGdW5sZXNzIGZhY3Q6IHBsZWFzZSBnbyByZWFkIHRoZSBmaXJzdCBjb3VwbGUgY2hhcHRlcnMgb2YgYSBjb2RpbmcgaW4gamF2YSB0ZXh0Ym9vaw0KRnVubmVyIGZhY3Q6IGRhdGEgc3RydWN0dXJlIGlzIG5lYXQsIHNheSB5b3Ugd2FudCB0byBzdG9yZSBhIG51bWJlciwgIjEiLCB5b3UgY2FuIGRvIHNvIGluIGphdmEgYnkgdGVsbGluZyBpdCBhIGRhdGF0eXBlIChpbnQgZm9yIGludGVnZXIpLCBhbmQgdGhlbiBhIHZhbHVlLCBmb3IgZXhhbXBsZSBpbnQgeD0xOyB0aGlzIHRlbGxzIHRoZSBjb21wdXRlciB0aGF0IHggaXMgZXF1YWwgdG8gb25lLiBHcmVhdCBidXQgaW50IG9ubHkgd29ya3MgZm9yIG51bWJlcnMgKGFuZCBub3QgZXZlbiBhbGwgb2YgdGhlbSA7KSwgc28gd2hhdCBpcyB5b3Ugd2FudGVkIHRvIHN0b3JlIGEgbGV0dGVyPyB3ZWxsIHlvdSB1c2UgY2hhciAoZm9yIGNoYXJhY3RlciksIHNvIGNoYXIgeT0iYiI7IHRoaXMgaXMgc2F5aW5nIHRoYXQgeSBpcyBlcXVhbCB0byB0aGUgbGV0dGVyICJiIi4gT2J2aW91c2x5IHRoaXMgcXVpY2sgZXhhbXBsZSBsb29zZXMgYWxvdCBvZiB0aGUgc3VidGx5IGFuZCBjb21wbGV4aXR5IG9mIHRoZSBzeXN0ZW0gKHJlOiBnbyByZWFkIHRoZSBmaXJzdCBjb3VwbGUgY2hhcHRlcnMgb2YgYSBqYXZhIHRleHRib29rKSwgYnV0IGFsYXMuDQoNClNvIG5vdyBsZXRzIHNheSB5b3Ugd2FudGVkIGEgdGhpbmcsIGxldHMgY2FsbCBpdCBhIGNsYXNzLCB0aGF0IGNvbnRhaW5lZCBhIG51bWJlciBhbmQgYSBjaGFyYWN0ZXIsIHlvdSBjb3VsZCBjcmVhdGUgYSBjbGFzcyB0aGF0IHVzZWQgeCBhbmQgaXQgdXNlZCB5IHRvIGNyZWF0ZSBhbiBvYmplY3QuIFRoaXMgaXMgYSBwb29yIGV4cGxpbmF0aW9uIHRoYXQgaGFzIGxpa2VseSBtYWRlIHNldmVyYWwgY29tcHV0ZXIgc2NpZW50aXN0cyBzYWQgYnV0IHdoYXRldmVyLCBwaHlsb3NlcSBpcyBhIGNsYXNzIHRoYXQgY3JlYXRlcyBwaHlsb3NlcSBvYmplY3RzLCBlYWNoIG9iamVjdCBoYXZpbmcgYXQgYSBtaW5pbXVtIGFuIGFidW5kYW5jZSB0YWJsZSAobWV0YUdfKSBhbmQgYSB0YXhvbm9teSB0YWJsZSAoVGF4XykuIEV4Y2VsZW50IHlvdSBhcmUgbm93IGVxdWFsbHkgY29uZnVzZWQgYXMgZWFybGllciBidXQgSSBmZWVsIGxpa2UgSSd2ZSBkb25lIG15IGR1ZGlsbGVnZW5jZSwgb253YXJkLg0KDQpXZSBoYXZlIHRvIHRha2Ugb3VyIHRhYmxlcyAodGhhdCBleGlzdCBhcyBhIGRhdGFmcmFtZSkgYW5kIGNvbnZlcnQgdGhlbSBpbnRvIGEgbWF4dHJpeCwgd2h5PyBiZWNhdXNlIHRoZSBwaHlsb3NlcSBjbGFzcyB1c2VzIG1hdHJpeGVzIGFuZCBub3QgZGF0YWZyYW1lcyAoaW4gdGhlIGV4YW1wbGUgYWJvdmUgd2UgY291bGRuJ3QgZmVlZCBvdXIgY2xhc3MgdHdvIGludCB2YWx1ZXMsIGl0IHdhbnRzIGFuZCBpbnQgYW5kIGEgY2hhciEpDQoNCmBgYHtyfQ0KI25vdyByZWFsIHN0dWZmDQojY29udmVydCB0aGVzZSBiYWQgYm95cyB0byBtYXRyaXhlcw0KVGF4XzEgPC0gYXMubWF0cml4KFRheF8xKQ0KTWV0YUdfMSA8LSBhcy5tYXRyaXgoTWV0YUdfMSkNCg0KVGF4XzIgPC0gYXMubWF0cml4KFRheF8yKQ0KTWV0YUdfMiA8LSBhcy5tYXRyaXgoTWV0YUdfMikNCg0KYGBgDQoNCllvdSBjYW4gY2hlY2sgdGhlIGNsYXNzIG9mIHRoZSBvYmplY3RzIHdpdGggYSBzaW1wbGUgY29tbWFuZCAob2ggeWVzIHRoZSB0YWJsZXMgaGF2ZSBiZWVuIG9iamVjdHMgYWxsIGFsb25nLCB3ZSdyZSBjcmVhdGluZyBvYmplY3RzIHdpdGhpbiBjbGFzc2VzIHdpdGhpbiBjbGFzc2VzISBuZWF0IGlzbnQgaXQ/KQ0KDQpgYGB7cn0NCiNjaGVjaw0KY2xhc3MoVGF4XzEpDQpjbGFzcyhNZXRhR18xKQ0KY2xhc3MoVGF4XzIpDQpjbGFzcyhNZXRhR18yKQ0KYGBgDQoNCk5vdyBwaHlsb3NlcSB3YW50cyB1cyB0byB0dXJuIHRoZXNlIG1hdHJpY2VzIGludG8gYSBkaWZmZXJlbnQgY2xhc3MNCg0KYGBge3J9DQoNCk9UVV8xID0gb3R1X3RhYmxlKE1ldGFHXzEsIHRheGFfYXJlX3Jvd3MgPSBUUlVFKQ0KVEFYXzEgPSB0YXhfdGFibGUoVGF4XzEpDQoNCk9UVV8yID0gb3R1X3RhYmxlKE1ldGFHXzIsIHRheGFfYXJlX3Jvd3MgPSBUUlVFKQ0KVEFYXzIgPSB0YXhfdGFibGUoVGF4XzIpDQpgYGANCg0KTm93IHdlJ2xsIGNyZWF0ZSBhIHBoeWxvc2VxIG9iamVjdCB3aXRoIGVhY2ggT1RVIHRhYmxlIGFuZCBUQVhvbm9teSB0YWJsZQ0KDQpgYGB7cn0NCiNjb21iaW5lIHRoYXQgZGF0YQ0KcGh5c2VxXzEgPSBwaHlsb3NlcShPVFVfMSwgVEFYXzEpDQpwaHlzZXFfMiA9IHBoeWxvc2VxKE9UVV8yLCBUQVhfMikNCmBgYA0KDQpOb3cgd2UnbGwgbWVyZ2UgdGhlIHR3byBwaHlsb3NlcSBvYmplY3RzLCBiZWNhdXNlIHdlIG5hbWVkIHRoZSBPVFUgcm93IHZhbHVlcyBkaWZmZXJlbnRseSB0aGVyZSB3aWxsIG5vdCBiZSBvdmVybGFwIGJldHdlZW4gdGhlIHR3byBzYW1wbGVzDQoNCmBgYHtyfQ0KcGh5c2VxPC1tZXJnZV9waHlsb3NlcShwaHlzZXFfMSxwaHlzZXFfMikNCmBgYA0KDQpOb3cgd2UgaGF2ZSB0byBjb25nbG9tZXJhdGUgb3VyIGRhdGEgc28gdGhhdCBPVFVzIHNwZWNpZnlpbmcgdGhlIHNhbWUgdGhpbmcgYXJlIGNvbWJpbmVkLiBUaGlzIGNvZGUgZGVzdG9yeXMgdGhlIHNwZWNpZXMgbGV2ZWwgY29tcGFyaXNpb24gYW5kIHNheXMgaWYgaXQgZXhpc3RzIHdpdGhpbiB0aGlzIGZhbWlseSBhZGQgaXQgdG8gdG90YWwgZmFtaWx5IHZhbHVlDQpJZiB5b3UgYXJlIHdvcmtpbmcgb24gYSBzcGVjaWVzIGxldmVsIGNvbXBhcmlzb24gZG8gbm90IGRvIHRoaXMgYXMgaXQgd2lsbCBub3Qgd29yazsgaG93ZXZlciwgZm9yIHRoaXMgZGF0YSBzZXQgd2UgYXJlIGxvb2tpbmcgb24gYW4gb3JkZXIgYW5kIGZhbWlseSBsZXZlbCBzbyBpdCBkb2VzIG5vdCBsb3NlIGRhdGEuIFRoZXJlIGFyZSBiZXR0ZXIgd2F5cyB0byBtZXJnZSBkYXRhIGJ1dCB0aG9zZSBhcmUgZG9uZSB3aXRoaW4gdGhlIGRhZGEyIHBpcGVsaW5lIGJlZm9yZSB0YXhvbm9teSBhc3NpZ25tZW50LCBJIGRpZCBub3QgZG8gZGFkYTIgYW5hbHlzaXMgb24gdGhlc2Ugc2FtcGxlcyBhbmQgdGhlcmVmb3JlIGkgaGF2ZSB0byBkbyB0aGlzIChwb29yZXIpIHdheSBvZiBtZXJnaW5nIHNhbXBsZXMuIA0KDQpgYGB7cn0NCnBoeXNlcSA8LSB0YXhfZ2xvbShwaHlzZXEsIHRheHJhbmsgPSByYW5rX25hbWVzKHBoeXNlcSlbNV0sIE5Bcm0gPSBGQUxTRSkNCmBgYA0KRnVuIGZhY3Q6IDUgY29ycmVzcG9uZHMgdG8gZmFtaWx5IGp1c3QgbGlrZSA2IGlzIGdlbnVzIGFuZCAxIGlzIGtpbmdkb20NCmlmIHlvdSBpbnNwZWN0IHRoZSBwaHlzZXEgb2JqZWN0IHlvdSBjYW4gc2VlIHRoYXQgdGhlIHRheCB0YWJsZSBlbmRzIGF0IGZhbWlseSwgYnV0IGRpZG50IGRlbGV0ZSB2YWx1ZXMgd2l0aCBOQSAoTkFybSA9IEZBTFNFLCByZWFkIE5BIHJlbW92ZSA9IGZhbHNlKQ0KYGBge3J9DQpwaHlzZXFAdGF4X3RhYmxlDQpgYGANCg0KRXhjZWxsZW50LCBhbG1vc3QgZG9uZSENCg0KTm93IGlmIHlvdSBpbnNwZWN0IHRoZSBzYW1wbGUgbmFtZXMgdGhleSBoYXZlIGEgdmFyaWV0eSBvZiBtZWFuaW5ncw0KYGBge3J9DQpwaHlzZXFAb3R1X3RhYmxlDQpgYGANClRoaW5ncyBsaWtlICJtdW5pY2lwYWwgY29tcG9zdCIsICJmZXJ0YWxpemVkIiBlY3QsIHRoaXMgaXMgbWV0YWRhdGEgdGhhdCBhcmUgaW4gdGhlIHNhbXBsZSBuYW1lcywgYnV0IHRoZSBwaHlsb3NlcSBvYmplY3QgZG9lc24ndCBrbm93IGFib3V0IHlldC4gDQpGdW4gZmFjdDogaWYgeW91IHdhbnQgdG8ga25vdyB3aGF0IHRoaXMgYWN0dWFsbHkgaXMgb3Igd2hhdCB0aGUgbmFtZXMgbWVhbiBhc2sgdG8gcmVhZCBteSBtYW51c2NyaXB0DQpidXQgd2UgbXVzdCBpbXBvcnQgdGhpcyBtZXRhZGF0YS4gDQoNCmBgYHtyfQ0KS2V5IDwtIHJlYWRfY3N2KCJDOlxcVXNlcnNcXGFiYWxsXFxPbmVEcml2ZSAtIFVOQkNcXEFuZ3VzIEJhbGxcXExhYiB3b3JrXFxVTFRSQVxcVGhleSBjYWxsIG1lLi4uIGRhdGFcXEFuZ3VzLTE2U1xcdWx0cmEgdG8gY2F0ZWdvcmllcyBrZXkuY3N2IikNCmBgYA0KDQppZiB5b3UgZXhwbG9yZSB0aGlzIGRvY3VtZW50LCB5b3UnbGwgcmVhbGl6ZSBpdCBoYXMgYWxsIHRoZSBzYW1wbGVzIGluIG9yZGVyIHRoZXkgYXBwZWFyIG9uIGNvbHVtbiBuYW1lcyB3aXRoIHRoZSBtZXRhIGRhdGEgaW4gb3RoZXIgY29sdW1ucw0KDQoNCmZvciB0aGUgc2FtZSByZWFzb25zIHdlIGNvbnZlcnRlZCB0byBPVFUgZWFybGllciAocGh5bG9zZXEgYmVpbmcgZmlja2xlKSwgd2UgaGF2ZSB0byBtYWtlIHRoZSBzYW1wbGUgbmFtZXMgYmUgdGhlIGxlZnQgbW9zdCByb3cgbmFtZQ0KYGBge3J9DQpLZXkgPC0gZGF0YS5mcmFtZShLZXlbLC0xXSwgcm93Lm5hbWVzPUtleSROYW1lKQ0Kc2FtcGxlZGF0YSA9IHNhbXBsZV9kYXRhKEtleSkNCmBgYA0KDQoNCg0KTm93IHdlIHdpbGwgYWRkIHRoZSBrZXkgZGF0YSANCmBgYHtyfQ0KcGh5c2VxX0tleSA9IG1lcmdlX3BoeWxvc2VxKHBoeXNlcSwgc2FtcGxlZGF0YSkNCmBgYA0KDQoNCkNvbmdyYXRzIHlvdSBhcmUgZG9uZSAobGllKSEhISBZb3Ugbm93IGhhdmUgYSBwaHlsb3NlcSBvYmplY3QgYW5kIGNhbiBtb3ZlIG9uIHRvIHRyYW5zZm9ybWF0aW9ucyBhbmQgZGF0YSBhbmFseXNpcw0KDQo=</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIkltcG9ydGluZyBkYXRhIGZyb20gREFEQTIgdmlhIFBoeWxvc2VxIg0Kb3V0cHV0OiBodG1sX25vdGVib29rDQotLS0NCg0KDQpIaSwgYnkgbm93IHlvdSd2ZSBwcm9jZXNzZWQgeW91ciBkYXRhIHRocm91Z2ggREFEQTIgYW5kIG5vdyBpdHMgdGltZSBmb3Igc29tZSBkYXRhIGFuYWx5c2lzISEhIGhhaGEgc2lrZSwgd2UgaGF2ZSB0byBmb3JtYXQgaXQgZmlyc3QsIGdldCByZWt0DQoNCkJpb21hbmFnZXIgaXMgYSBuYW1lIHRoYXRzIGdvbm5hIGNvbWUgdXAgYWxvdCwgYnV0IHdoYXQgaXMgYmlvbWFuYWdlcj8gd2VsbCBpdHMgYWN0dWFsbHkgY2FsbGVkIGJpb2NvbmR1Y3RvciAobG92ZSB0aGUgbmFtaW5nIHNjaGVtZSksIGFuZCBpdHMgYSBkYXRhYmFzZSB3aXRoIGFsbCB0aGUgYmlnIGJveXMgaW4gYmlvaW5mb3JtYXRpY3Mgc29mdHdhcmUsIHNvIHdoZW4gd2Ugd2FudCB0byB1c2Ugc3BlY2lmaWMgcGFja2FnZXMgd2UnbGwgaGF2ZSB0byBpbnN0YWxsIHRoZW0gZGlyZWN0bHkgZnJvbSBiaW9tYW5hZ2VyLiANCg0KVGhpcyBpcyBob3cgdG8gZG8gdGhhdDoNCmBgYHtyLCBlY2hvID0gVCwgbWVzc2FnZT1GQUxTRX0NCg0KDQojcGh5bG9zZXEgYW5kIGJpb21hbmFnZXINCmlmICghcmVxdWlyZSgiQmlvY01hbmFnZXIiLCBxdWlldGx5ID0gVFJVRSkpDQppbnN0YWxsLnBhY2thZ2VzKCJCaW9jTWFuYWdlciIpDQpCaW9jTWFuYWdlcjo6aW5zdGFsbCgpDQpCaW9jTWFuYWdlcjo6aW5zdGFsbChjKCJwaHlsb3NlcSIpKQ0KDQojbWljcm9iaW9tZU1ha2VyDQppZiAoIXJlcXVpcmVOYW1lc3BhY2UoIkJpb2NNYW5hZ2VyIiwgcXVpZXRseSA9IFRSVUUpKQ0KICBpbnN0YWxsLnBhY2thZ2VzKCJCaW9jTWFuYWdlciIpDQpCaW9jTWFuYWdlcjo6aW5zdGFsbCgibWljcm9iaW9tZU1hcmtlciIpDQojZGFkYTINCmlmICghcmVxdWlyZU5hbWVzcGFjZSgiQmlvY01hbmFnZXIiLCBxdWlldGx5ID0gVFJVRSkpDQogICAgaW5zdGFsbC5wYWNrYWdlcygiQmlvY01hbmFnZXIiKQ0KQmlvY01hbmFnZXI6Omluc3RhbGwoImRhZGEyIiwgdmVyc2lvbiA9ICIzLjE3IikNCg0KYGBgDQoNCg0KDQoNClRoZXNlIGFyZSB0aGUgcGFja2FnZXMgeW91J2xsIG5lZWQNCmBgYHtyLCBlY2hvID0gVCwgbWVzc2FnZT1GQUxTRX0NCmxpYnJhcnkocGh5bG9zZXEpDQpsaWJyYXJ5KGdncGxvdDIpDQpsaWJyYXJ5KGphbml0b3IpDQpsaWJyYXJ5KGRwbHlyKQ0KbGlicmFyeSh0aWR5dmVyc2UpDQpsaWJyYXJ5KGdncHVicikNCmxpYnJhcnkoYXBlKQ0KbGlicmFyeShkYWRhMikNCg0KYGBgDQoNCk5vdyBpdHMgdGltZSB0byBpbXBvcnQgb3VyIGRhdGEgZnJvbSBEQVRBMiwgdW5mb3J0dW5hdGVseSB3ZSBuZWVkIHRvIHdvcmsgd2l0aCBhIC5jc3YgZmlsZSBhbmQgb3VyIGRhdGEgY29tZSBvZmYgaW4gdGV4dCBmaWxlcw0KRnVuIGZhY3Q6IC5jc3YgZmlsZXMgYXJlIGp1c3QgYmFzaWMgZXhjZWwgZmlsZXMNCg0KVG8gdHVybiB5b3VyIHRleHQgZmlsZXMgaW50byBhIC5jc3YgZmlsZSBvcGVuIGV4Y2VsIGFuZCB0aGVuIHRyeSB0byBvcGVuIHlvdXIgLnR4dCBmaWxlLiBFeGNlbCB3aWxsIGdvICJoZXkuLi4iIGFuZCB0cnkgdG8gY29udmVydCB5b3VyIHR4dCBmaWxlIGludG8gYW4gZXhjZWwgZmlsZS4gVGhpcyBpcyBwZXJmZWN0ISBPdXIgZmlsZSBpcyBkZWxpbWl0ZWQgKHRoZSBhdXRvcGlja2VkIG9wdGlvbiksIHZpYSB0YWIgKHRoZSBhdXRvcGlja2VkIG9wdGlvbiBhZnRlciB5b3UgY2xpY2sgbmV4dCBvbmNlKSwgc28gYWxsIHlvdSBoYXZlIHRvIGRvIGlzIG1lYW5kZXIgdGhyb3VnaCB0aGUgcG9wIHVwIGFuZCBleGNlbCB3aWxsIGRvIGFsbCB0aGUgaGVhdnkgbGlmdGluZyBmb3IgeW91ISBTaW1wbHkgc2F2ZSB5b3VyIGZpbGUgYXMgYSAuY3N2IGZpbGUgd2hlcmUgZXZlciB5b3UnZCBsaWtlIQ0KDQpOb3cgZ28gb2ZmIGludG8gdG8gd29ybGQgYW5kIGNyZWF0ZSBhIGNzdiBmaWxlIG9mIHlvdSAxNlNfUltuYW1lXV9kYWRhMl9ub2NoaW1fdGF4LnR4dCBmaWxlIQ0KT2theSBzd2VldCwgb24gdGhlIGxlZnQgc2hvdWxkIGJlIGEgcm93IG9mIFNWXzAuLlN2XzEwIGVjdCwgaW4gdGhlIG1pZGRsZSBpcyB5b3Ugc2FtcGxlIG5hbWUgd2l0aCBhbGwgdGhlIGNvdW50IGRhdGEgcGVyIHNwZWNpZXMgYW5kIG9uIHRoZSByaWdodCBpcyB0YXgudmVjdG9yLg0KDQoNCg0KRnVuIGZhY3Q6IGJhY2t1cHMhIGhleSBpJ3ZlIG5vdGljZWQgdGhhdCB5b3UgZGlkbid0IGltbWVkaWF0ZWx5IGNyZWF0ZSBhIGJhY2t1cCBhbmQgYSB3b3JraW5nIGNzdiBmaWxlLCBTaGFtZSBvbiB5b3UhIEl0cyBpbXBvcnRhbnQgdG8gYWx3YXlzIGNyZWF0ZSBiYWNrdXAgZmlsZXMgeW91IE5FVkVSIG1vZGlmeSBpbiBleGNlbCB3aGVuIHlvdSBnZXQgYSBuZXcgZmlsZSB5b3UgcGxhbiBvbiBtb2RpZnlpbmcuIEl0J2QgYmUgYSBzaGFtZSBpcyB5b3Ugd2VyZSB0byBkZWxldGUgc29tZXRoaW5nIHlvdSBzaG91bGRuJ3QgaGF2ZSBhbmQgdGhlbiByZXN0YXJ0IGZyb20gdGhlIGJlZ2lubmluZy4gDQoNCllvdSdyZSAxNlNfUltuYW1lXV9kYWRhMl9ub2NoaW1fdGF4LmNzdiBmaWxlIGlzIG5vdyByZWFkeSB0byBiZSBpbXBvcnRlZCBpbnRvIFINCg0KTGV0cyBpbXBvcnQgdGhpcyB0YWJsZQ0KDQpgYGB7ciwgZWNobyA9IFQsIG1lc3NhZ2U9RkFMU0V9DQpNZXRhR18xIDwtIHJlYWRfY3N2KCJDOlxcVXNlcnNcXGFuZ3VzXFxPbmVEcml2ZSAtIFVOQkNcXEFuZ3VzIEJhbGxcXExhYiB3b3JrXFxVTFRSQVxcVGhleSBjYWxsIG1lLi4uIGRhdGFcXEFuZ3VzLTE2U1xcMTZTLWRhZGEyX25vY2hpbV90YXguY3N2IikNCk1ldGFHXzIgPC0gcmVhZF9jc3YoIkM6XFxVc2Vyc1xcYW5ndXNcXE9uZURyaXZlIC0gVU5CQ1xcQW5ndXMgQmFsbFxcTGFiIHdvcmtcXFVMVFJBXFxUaGV5IGNhbGwgbWUuLi4gZGF0YVxcQW5ndXMtMTZTXFxSZWRvbmUgbWFzdGVybWl4IHN0dWZmXFwxNlNfUmVmSW5vY3VsdW1fZGFkYTJfbm9jaGltX3RheC5jc3YiKQ0KDQoNCmBgYA0KDQpDb25ncmF0cyEgV2Ugbm93IGhhdmUgdGhlIGRhdGEgaW4gUiwgeW91IG1heSBoYXZlIG5vdGljZWQgSSd2ZSBhY3R1YWxseSByZWFkIDIgc2VwYXJhdGUgc2V0cyBvZiBkYXRhLCAxIGFuZCAyLiBZb3UgbWlnaHQgbm90IGhhdmUgdHdvIHNldHMgb2YgZGF0YSBidXQgSSBkbyEuIFdlIHdpbGwgdGhlbiBjcmVhdGUgcGh5bG9zZXEgb2JqZWN0cyB3aXRoIGJvdGggdGhlc2UgZGF0YXNldHMNCg0KDQpGaXJzdCB0aGluZ3MgZmlyc3QsIHdlIGhhdmUgdG8gZm9ybWF0IHRoZSB0YWJsZXMgaW4gYSB3YXkgdGhhdCBwaHlsb3NlcSBpcyBleHBlY3RpbmcgdGhlbSBhbmQgdW5mb3J0dW5hdGVseSwgdGhpcyBpcyBhIGJpdCBvZiBhIHBhaW4uIFBoeWxvc2VxIGV4cGVjdHMgYSBjb3VwbGUgdGFibGVzLiBGaXJzdCBhIGNvdW50IHRhYmxlICh0aGlzIGlzIHRoZSBNZXRhRyB0YWJsZSksIEEgdGF4b25vbXkgdGFibGUgKFRoaXMgaXMgdGF4LnZlY3RvciksIGFuZCBhIHNhbXBsZSBkYXRhIHRhYmxlIChUaGlzIG9uZXMgYmFzZWQgb2ZmIG9mIHRoZSBncm91cCBvZiBkYXRhIHRoYXQgZXhpc3QgaW4geW91ciBzYW1wbGUpDQoNCkxldHMgZmlyc3Qgc3RhcnQgYnkgY3JlYXRpbmcgdGhlIHRheG9ub215IHRhYmxlIGZyb20gdGhlIE1ldGFHIHRhYmxlcyENCg0KYGBge3J9DQpUYXhfMTwtc2VsZWN0KE1ldGFHXzEsICgidGF4LnZlY3RvciIpKSANClRheF8yPC1zZWxlY3QoTWV0YUdfMiwgKCJ0YXgudmVjdG9yIikpDQpgYGANCk9oIGJvdGhlciEgUGh5bG9zZXEgZXhwZWN0cyB0aGUgdGF4b25vbXkgdG8gYmUgc2VwYXJhdGVkIGJ5IHRheG9ucyBpLmUuIG9uZSBjb2x1bW4gZm9yIGtpbmdkb20sIG9uZSBmb3IgZmFtaWx5IGVjdC4gQnV0IGV2ZXJ5dGhpbmcgaXMgdW5kZXIgb25lIGNvbHVtbi4gVGhpcyBtZWFucyB3ZSBoYXZlIHRvIGRlbGltaW5hdGUgYWdhaW4sIGFuZCBsb29raW5nIGF0IHRoZSBob3cgdG8gY29sdW1uIGlzIGNyZWF0ZWQgZnJvbSBEQURBMiwgd2UgbmVlZCB0byBkZWxpbWluYXRlIGJ5IGNvbG9uDQoNCmNTcGxpdCBkZWxpbWluYXRlcyB3aXRoaW4gYSBjb2x1bW4gYW5kIHRoZW4gdGhlIHJlbmFtZSBmdW5jdGlvbnMgbWFrZSBhbGwgdGhlIGNvbHVtbnMgbmFtZXMgcGh5bG9zZXEgZXhwZWN0cyENCg0KYGBge3J9DQpUYXhfMSA8LSBjU3BsaXQoVGF4XzEsICJ0YXgudmVjdG9yIiwgIjoiKQ0KVGF4XzEgPC0gcmVuYW1lKFRheF8xLA0KIEtpbmdkb20gPSB0YXgudmVjdG9yXzEsDQogUGh5bHVtID0gdGF4LnZlY3Rvcl8yLA0KIENsYXNzID0gdGF4LnZlY3Rvcl8zLA0KIE9yZGVyID0gdGF4LnZlY3Rvcl80LA0KIEZhbWlseSA9IHRheC52ZWN0b3JfNSwNCiBHZW51cyA9IHRheC52ZWN0b3JfNiwNCiBTcGVjaWVzID0gdGF4LnZlY3Rvcl83LA0KICANCiAgKQ0KVGF4XzIgPC0gY1NwbGl0KFRheF8yLCAidGF4LnZlY3RvciIsICI6IikNClRheF8yIDwtIHJlbmFtZShUYXhfMiwNCiBLaW5nZG9tID0gdGF4LnZlY3Rvcl8xLA0KIFBoeWx1bSA9IHRheC52ZWN0b3JfMiwNCiBDbGFzcyA9IHRheC52ZWN0b3JfMywNCiBPcmRlciA9IHRheC52ZWN0b3JfNCwNCiBGYW1pbHkgPSB0YXgudmVjdG9yXzUsDQogR2VudXMgPSB0YXgudmVjdG9yXzYsDQogU3BlY2llcyA9IHRheC52ZWN0b3JfNywNCiAgDQogICkNCg0KDQpgYGANCg0KDQoNCmBgYHtyfQ0KI3JlbW92ZSB0aGUgc1YgdmFsdWUNCk1ldGFHXzEgPC0gc2VsZWN0KE1ldGFHXzEsIC0oMSkpDQpNZXRhR18xIDwtIHNlbGVjdChNZXRhR18xLCAtKCJ0YXgudmVjdG9yIikpDQpNZXRhR18yIDwtIHNlbGVjdChNZXRhR18yLCAtKDEpKQ0KTWV0YUdfMiA8LSBzZWxlY3QoTWV0YUdfMiwgLSgidGF4LnZlY3RvciIpKQ0KDQpgYGANCldoYXQgd2UgZGlkIHdhcyByZW1vdmUgdGhlIGZpcnN0IGNvbHVtbiAoY29sdW1uICIxIikgZnJvbSB0aGUgZGF0YSBzZXQsIGkndmUgYWxzbyBpbmNsdWRlZCB0aGUgY29kZSB0byByZW1vdmUgdGhlIHRheC52ZWN0b3IgY29sdW1uIGhlcmUgDQoNCk5vdyB0aGlzIGlzIHJlYWwgZGF0YSwgYW5kIGZvciBwYXBlciByZWFzb25zIEkgd2FudCB0byByZW1vdmUgc29tZSBzYW1wbGVzIGZyb20gTWV0YUdfMS4gV2UgY2FuIHVzZSBhIHNpbWlsYXIgY29tcGFuZCB0byBkbyB0aGlzDQpgYGB7cn0NCiNVTFRSQQ0KTWV0YUdfMSA8LSBzZWxlY3QoTWV0YUdfMSwgLSgiQ0hCMVAxIjoiRk5QOUIzIikpDQoNCmBgYA0KDQpXZSBoYXZlIHRvIHRha2Ugb3VyIHRhYmxlcyAodGhhdCBleGlzdCBhcyBhIGRhdGFmcmFtZSkgYW5kIGNvbnZlcnQgdGhlbSBpbnRvIGEgbWF4dHJpeCwgd2h5PyBiZWNhdXNlIHRoZSBwaHlsb3NlcSBjbGFzcyB1c2VzIG1hdHJpeGVzIGFuZCBub3QgZGF0YWZyYW1lcyAoaW4gdGhlIGV4YW1wbGUgYWJvdmUgd2UgY291bGRuJ3QgZmVlZCBvdXIgY2xhc3MgdHdvIGludCB2YWx1ZXMsIGl0IHdhbnRzIGFuZCBpbnQgYW5kIGEgY2hhciEpDQoNCmBgYHtyfQ0KI25vdyByZWFsIHN0dWZmDQojY29udmVydCB0aGVzZSBiYWQgYm95cyB0byBtYXRyaXhlcw0KVGF4XzEgPC0gYXMubWF0cml4KFRheF8xKQ0KTWV0YUdfMSA8LSBhcy5tYXRyaXgoTWV0YUdfMSkNCg0KVGF4XzIgPC0gYXMubWF0cml4KFRheF8yKQ0KTWV0YUdfMiA8LSBhcy5tYXRyaXgoTWV0YUdfMikNCg0KYGBgDQoNCllvdSBjYW4gY2hlY2sgdGhlIGNsYXNzIG9mIHRoZSBvYmplY3RzIHdpdGggYSBzaW1wbGUgY29tbWFuZCAob2ggeWVzIHRoZSB0YWJsZXMgaGF2ZSBiZWVuIG9iamVjdHMgYWxsIGFsb25nLCB3ZSdyZSBjcmVhdGluZyBvYmplY3RzIHdpdGhpbiBjbGFzc2VzIHdpdGhpbiBjbGFzc2VzISBuZWF0IGlzbnQgaXQ/KQ0KDQpgYGB7cn0NCiNjaGVjaw0KY2xhc3MoVGF4XzEpDQpjbGFzcyhNZXRhR18xKQ0KY2xhc3MoVGF4XzIpDQpjbGFzcyhNZXRhR18yKQ0KYGBgDQoNCg0KUGh5bG9zZXEgZXhwZWN0cyB0aGUgZmFyIGxlZnQgY29sdW1uIHRvIGJlIGNhbGxlZCBPVFUsIHRoaXMgaXMgaG93IHRvIGRvIGl0LCBJJ20gbmFtaW5nIHRoZSBPVFVzIDEgYW5kIDIgYmVjYXVzZSBvZiBob3cgcGh5bG9zZXEgbWVyZ2VzIHJvdyBuYW1lcyBsYXRlciBvbg0KYGBge3J9DQojY2FsbCByb3cgdmFsdWVzIE9UVQ0Kcm93bmFtZXMoTWV0YUdfMSkgPC0gcGFzdGUwKCJPVFUiLCAxOm5yb3coTWV0YUdfMSkpDQpyb3duYW1lcyhUYXhfMSkgPC0gcGFzdGUwKCJPVFUiLCAxOm5yb3coVGF4XzEpKQ0KDQpyb3duYW1lcyhNZXRhR18yKSA8LSBwYXN0ZTAoIjJfT1RVIiwgMTpucm93KE1ldGFHXzIpKQ0Kcm93bmFtZXMoVGF4XzIpIDwtIHBhc3RlMCgiMl9PVFUiLCAxOm5yb3coVGF4XzIpKQ0KDQpgYGANCg0KVmVyeSBzY2FyeSBsb29raW5nIG1lc3NhZ2UsIGJ1dCBpdCBvbmx5IHJlYWRzIHRoYXQgd2UgZGVsZXRlZCBhbmQgcmVwbGFjZWQgdGhlIHByZXZpb3VzIHJvdyBuYW1lcw0KDQpPa2F5IGhvcGVmdWxseSB5b3Uga25vdyBhIGJpdCBhYm91dCBvYmplY3RzL2NsYXNzZXMsIGlmIG5vdA0KRnVubGVzcyBmYWN0OiBwbGVhc2UgZ28gcmVhZCB0aGUgZmlyc3QgY291cGxlIGNoYXB0ZXJzIG9mIGEgY29kaW5nIGluIGphdmEgdGV4dGJvb2sNCkZ1bm5lciBmYWN0OiBkYXRhIHN0cnVjdHVyZSBpcyBuZWF0LCBzYXkgeW91IHdhbnQgdG8gc3RvcmUgYSBudW1iZXIsICIxIiwgeW91IGNhbiBkbyBzbyBpbiBqYXZhIGJ5IHRlbGxpbmcgaXQgYSBkYXRhdHlwZSAoaW50IGZvciBpbnRlZ2VyKSwgYW5kIHRoZW4gYSB2YWx1ZSwgZm9yIGV4YW1wbGUgaW50IHg9MTsgdGhpcyB0ZWxscyB0aGUgY29tcHV0ZXIgdGhhdCB4IGlzIGVxdWFsIHRvIG9uZS4gR3JlYXQgYnV0IGludCBvbmx5IHdvcmtzIGZvciBudW1iZXJzIChhbmQgbm90IGV2ZW4gYWxsIG9mIHRoZW0gOyksIHNvIHdoYXQgaXMgeW91IHdhbnRlZCB0byBzdG9yZSBhIGxldHRlcj8gd2VsbCB5b3UgdXNlIGNoYXIgKGZvciBjaGFyYWN0ZXIpLCBzbyBjaGFyIHk9ImIiOyB0aGlzIGlzIHNheWluZyB0aGF0IHkgaXMgZXF1YWwgdG8gdGhlIGxldHRlciAiYiIuIE9idmlvdXNseSB0aGlzIHF1aWNrIGV4YW1wbGUgbG9vc2VzIGFsb3Qgb2YgdGhlIHN1YnRseSBhbmQgY29tcGxleGl0eSBvZiB0aGUgc3lzdGVtIChyZTogZ28gcmVhZCB0aGUgZmlyc3QgY291cGxlIGNoYXB0ZXJzIG9mIGEgamF2YSB0ZXh0Ym9vayksIGJ1dCBhbGFzLg0KDQpTbyBub3cgbGV0cyBzYXkgeW91IHdhbnRlZCBhIHRoaW5nLCBsZXRzIGNhbGwgaXQgYSBjbGFzcywgdGhhdCBjb250YWluZWQgYSBudW1iZXIgYW5kIGEgY2hhcmFjdGVyLCB5b3UgY291bGQgY3JlYXRlIGEgY2xhc3MgdGhhdCB1c2VkIHggYW5kIGl0IHVzZWQgeSB0byBjcmVhdGUgYW4gb2JqZWN0LiBUaGlzIGlzIGEgcG9vciBleHBsYW5hdGlvbiB0aGF0IGhhcyBsaWtlbHkgbWFkZSBzZXZlcmFsIGNvbXB1dGVyIHNjaWVudGlzdHMgc2FkIGJ1dCB3aGF0ZXZlciwgcGh5bG9zZXEgaXMgYSBjbGFzcyB0aGF0IGNyZWF0ZXMgcGh5bG9zZXEgb2JqZWN0cywgZWFjaCBvYmplY3QgaGF2aW5nIGF0IGEgbWluaW11bSBhbiBhYnVuZGFuY2UgdGFibGUgKG1ldGFHXykgYW5kIGEgdGF4b25vbXkgdGFibGUgKFRheF8pLiBFeGNlbGxlbnQgeW91IGFyZSBub3cgZXF1YWxseSBjb25mdXNlZCBhcyBlYXJsaWVyIGJ1dCBJIGZlZWwgbGlrZSBJJ3ZlIGRvbmUgbXkgZHVlIGRpbGxlZ2VuY2UsIG9ud2FyZC4NCg0KDQpOb3cgcGh5bG9zZXEgd2FudHMgdXMgdG8gdHVybiB0aGVzZSBtYXRyaWNlcyBpbnRvIGEgZGlmZmVyZW50IGNsYXNzIGNyZWF0ZWQgYnkgcGh5bG9zZXEgKG5vdCBpc250IGEgcGh5bG9zZXEgb2JqZWN0IHlldCkNCg0KYGBge3J9DQoNCk9UVV8xID0gb3R1X3RhYmxlKE1ldGFHXzEsIHRheGFfYXJlX3Jvd3MgPSBUUlVFKQ0KVEFYXzEgPSB0YXhfdGFibGUoVGF4XzEpDQoNCk9UVV8yID0gb3R1X3RhYmxlKE1ldGFHXzIsIHRheGFfYXJlX3Jvd3MgPSBUUlVFKQ0KVEFYXzIgPSB0YXhfdGFibGUoVGF4XzIpDQpgYGANCg0KTm93IHdlJ2xsIGNyZWF0ZSBhIHBoeWxvc2VxIG9iamVjdCB3aXRoIGVhY2ggT1RVIHRhYmxlIGFuZCBUQVhvbm9teSB0YWJsZQ0KDQpgYGB7cn0NCiNjb21iaW5lIHRoYXQgZGF0YQ0KcGh5c2VxXzEgPSBwaHlsb3NlcShPVFVfMSwgVEFYXzEpDQpwaHlzZXFfMiA9IHBoeWxvc2VxKE9UVV8yLCBUQVhfMikNCmBgYA0KDQpOb3cgd2UnbGwgbWVyZ2UgdGhlIHR3byBwaHlsb3NlcSBvYmplY3RzLCBiZWNhdXNlIHdlIG5hbWVkIHRoZSBPVFUgcm93IHZhbHVlcyBkaWZmZXJlbnRseSB0aGVyZSB3aWxsIG5vdCBiZSBvdmVybGFwIGJldHdlZW4gdGhlIHR3byBzYW1wbGVzDQoNCmBgYHtyfQ0KcGh5c2VxPC1tZXJnZV9waHlsb3NlcShwaHlzZXFfMSxwaHlzZXFfMikNCmBgYA0KDQpOb3cgd2UgaGF2ZSB0byBjb25nbG9tZXJhdGUgb3VyIGRhdGEgc28gdGhhdCBPVFVzIHNwZWNpZnlpbmcgdGhlIHNhbWUgdGhpbmcgYXJlIGNvbWJpbmVkLiBUaGlzIGNvZGUgZGVzdHJveXMgdGhlIHNwZWNpZXMgbGV2ZWwgY29tcGFyaXNvbiBhbmQgc2F5cyBpZiBpdCBleGlzdHMgd2l0aGluIHRoaXMgZmFtaWx5IGFkZCBpdCB0byB0b3RhbCBmYW1pbHkgdmFsdWUNCklmIHlvdSBhcmUgd29ya2luZyBvbiBhIHNwZWNpZXMgbGV2ZWwgY29tcGFyaXNvbiBkbyBub3QgZG8gdGhpcyBhcyBpdCB3aWxsIG5vdCBsZXQgeW91IHdvcmsgb24gc3BlY2llcyBsZXZlbCBjb21wYXJpc29uczsgaG93ZXZlciwgZm9yIHRoaXMgZGF0YSBzZXQgd2UgYXJlIGxvb2tpbmcgb24gYW4gb3JkZXIgYW5kIGZhbWlseSBsZXZlbCBzbyBpdCBkb2VzIG5vdCBsb3NlIHNlbnNpdGl2aXR5LiBUaGVyZSBhcmUgYmV0dGVyIHdheXMgdG8gbWVyZ2UgZGF0YSBidXQgdGhvc2UgYXJlIGRvbmUgd2l0aGluIHRoZSBkYWRhMiBwaXBlbGluZSBiZWZvcmUgdGF4b25vbXkgYXNzaWdubWVudCwgSSBkaWQgbm90IGRvIGRhZGEyIGFuYWx5c2lzIG9uIHRoZXNlIHNhbXBsZXMgYW5kIHRoZXJlZm9yZSBpIGhhdmUgdG8gZG8gdGhpcyAocG9vcmVyKSB3YXkgb2YgbWVyZ2luZyBzYW1wbGVzLiBNYXliZSBJJ2xsIGZpbmQgYSBiZXR0ZXIgd2F5IHRvIGRvIGl0IGxhdGVyLCBJZiB5b3UgZG8gdGVsbCBtZS4NCg0KYGBge3J9DQpwaHlzZXEgPC0gdGF4X2dsb20ocGh5c2VxLCB0YXhyYW5rID0gcmFua19uYW1lcyhwaHlzZXEpWzVdLCBOQXJtID0gRkFMU0UpDQpgYGANCkZ1biBmYWN0OiA1IGNvcnJlc3BvbmRzIHRvIGZhbWlseSBqdXN0IGxpa2UgNiBpcyBnZW51cyBhbmQgMSBpcyBraW5nZG9tDQppZiB5b3UgaW5zcGVjdCB0aGUgcGh5c2VxIG9iamVjdCB5b3UgY2FuIHNlZSB0aGF0IHRoZSB0YXggdGFibGUgZW5kcyBhdCBmYW1pbHksIGJ1dCBkaWRudCBkZWxldGUgdmFsdWVzIHdpdGggTkEgKE5Bcm0gPSBGQUxTRSwgcmVhZCBOQSByZW1vdmUgPSBmYWxzZSkNCmBgYHtyfQ0KcGh5c2VxQHRheF90YWJsZQ0KYGBgDQoNCkV4Y2VsbGVudCwgYWxtb3N0IGRvbmUhDQoNCk5vdyBpZiB5b3UgaW5zcGVjdCB0aGUgc2FtcGxlIG5hbWVzIHRoZXkgaGF2ZSBhIHZhcmlldHkgb2YgbWVhbmluZ3MNCmBgYHtyfQ0KcGh5c2VxQG90dV90YWJsZQ0KYGBgDQpUaGluZ3MgbGlrZSAibXVuaWNpcGFsIGNvbXBvc3QiLCAiZmVydGFsaXplZCIgZWN0LCB0aGlzIGlzIG1ldGFkYXRhIHRoYXQgYXJlIGluIHRoZSBzYW1wbGUgbmFtZXMsIGJ1dCB0aGUgcGh5bG9zZXEgb2JqZWN0IGRvZXNuJ3Qga25vdyBhYm91dCB5ZXQuIA0KRnVuIGZhY3Q6IGlmIHlvdSB3YW50IHRvIGtub3cgd2hhdCB0aGlzIGFjdHVhbGx5IGlzIG9yIHdoYXQgdGhlIG5hbWVzIG1lYW4gYXNrIHRvIHJlYWQgbXkgbWFudXNjcmlwdA0KYnV0IHdlIG11c3QgaW1wb3J0IHRoaXMgbWV0YWRhdGEuIA0KDQpgYGB7cn0NCktleSA8LSByZWFkX2NzdigiQzpcXFVzZXJzXFxhbmd1c1xcT25lRHJpdmUgLSBVTkJDXFxBbmd1cyBCYWxsXFxMYWIgd29ya1xcVUxUUkFcXFRoZXkgY2FsbCBtZS4uLiBkYXRhXFxBbmd1cy0xNlNcXHVsdHJhIHRvIGNhdGVnb3JpZXMga2V5LmNzdiIpDQpgYGANCg0KaWYgeW91IGV4cGxvcmUgdGhpcyBkb2N1bWVudCwgeW91J2xsIHJlYWxpemUgaXQgaGFzIGFsbCB0aGUgc2FtcGxlcyBpbiBvcmRlciB0aGV5IGFwcGVhciBvbiBjb2x1bW4gbmFtZXMgd2l0aGluIHRoZSBNZXRhRyB0YWJsZSwgYnV0IHRoZXkgYXJlIGluIHRoZSByb3dzIGluc3RlYWQuIFRoZSBtZXRhIGRhdGEgaW4gb3RoZXIgY29sdW1ucw0KDQoNCmZvciB0aGUgc2FtZSByZWFzb25zIHdlIGNvbnZlcnRlZCB0byBPVFUgZWFybGllciAocGh5bG9zZXEgYmVpbmcgZmlja2xlKSwgd2UgaGF2ZSB0byBtYWtlIHRoZSBzYW1wbGUgbmFtZXMgYmUgdGhlIGxlZnQgbW9zdCByb3cgbmFtZQ0KYGBge3J9DQpLZXkgPC0gZGF0YS5mcmFtZShLZXlbLC0xXSwgcm93Lm5hbWVzPUtleSROYW1lKQ0Kc2FtcGxlZGF0YSA9IHNhbXBsZV9kYXRhKEtleSkNCmBgYA0KDQoNCg0KTm93IHdlIHdpbGwgYWRkIHRoZSBrZXkgZGF0YSANCmBgYHtyfQ0KcGh5c2VxX0tleSA9IG1lcmdlX3BoeWxvc2VxKHBoeXNlcSwgc2FtcGxlZGF0YSkNCmBgYA0KDQoNCkNvbmdyYXRzIHlvdSBhcmUgZG9uZSAobGllKSEhISBZb3Ugbm93IGhhdmUgYSBwaHlsb3NlcSBvYmplY3QgYW5kIGNhbiBtb3ZlIG9uIHRvIHRyYW5zZm9ybWF0aW9ucyBhbmQgZGF0YSBhbmFseXNpcw0KDQo=</div>
 
 
 

@@ -11,7 +11,7 @@
 
 
 
-<title>Importing data from DADA2 via Phyloseq</title>
+<title>Creating a tsv file from your phyloseq object</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -1746,458 +1746,82 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">Importing data from DADA2 via Phyloseq</h1>
+<h1 class="title toc-ignore">Creating a tsv file from your phyloseq
+object</h1>
 
 </div>
 
 
 <!-- rnb-text-begin -->
-<p>By Angus Ball</p>
-<p>Hi, by now you’ve processed your data through DADA2 and now its time
-for some data analysis!!! haha sike, we have to format it first, get
-rekt</p>
-<p>These are the packages you’ll need</p>
+<p>By Angus ball</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShwaHlsb3NlcSlcbmxpYnJhcnkoZ2dwbG90MilcbmxpYnJhcnkoamFuaXRvcilcbmxpYnJhcnkoZHBseXIpXG5saWJyYXJ5KHRpZHl2ZXJzZSlcbmxpYnJhcnkoZ2dwdWJyKVxubGlicmFyeShhcGUpXG5saWJyYXJ5KHNwbGl0c3RhY2tzaGFwZSlcbmxpYnJhcnkoQmlvc3RyaW5ncylcbmBgYCJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShwaHlsb3NlcSlcbmxpYnJhcnkodGlkeXIpXG5gYGAifQ== -->
 <pre class="r"><code>library(phyloseq)
-library(ggplot2)
-library(janitor)
-library(dplyr)
-library(tidyverse)
-library(ggpubr)
-library(ape)
-library(splitstackshape)
-library(Biostrings)</code></pre>
+library(tidyr)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>Now its time to import our data from DATA2, unfortunately we need to
-work with a .csv file and our data come off in text files Fun fact: .csv
-files are just basic excel files</p>
-<p>To turn your text files into a .csv file open excel and then try to
-open your .txt file. Excel will go “hey…” and try to convert your txt
-file into an excel file. This is perfect! Our file is delimited (the
-autopicked option), via tab (the autopicked option after you click next
-once), so all you have to do is meander through the pop up and excel
-will do all the heavy lifting for you! Simply save your file as a .csv
-file where ever you’d like!</p>
-<p>Now go off into to world and create a csv file of you
-16S_R[name]_dada2_nochim_tax.txt file! Okay sweet, on the left should be
-a row of SV_0..Sv_10 ect, in the middle is you sample name with all the
-count data per species and on the right is tax.vector.</p>
-<p>Fun fact: backups! hey i’ve noticed that you didn’t immediately
-create a backup and a working csv file, Shame on you! Its important to
-always create backup files you NEVER modify in excel when you get a new
-file you plan on modifying. It’d be a shame is you were to delete
-something you shouldn’t have and then restart from the beginning.</p>
-<p>You’re 16S_R[name]_dada2_nochim_tax.csv file is now ready to be
-imported into R</p>
-<p>Lets import this table</p>
+<p>Bring in your full phyloseq object WITH sequence information</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuTWV0YUdfMSA8LSByZWFkX2NzdihcIkM6XFxcXFVzZXJzXFxcXGFuZ3VzXFxcXE9uZURyaXZlIC0gVU5CQ1xcXFxBbmd1cyBCYWxsXFxcXExhYiB3b3JrXFxcXFVMVFJBXFxcXFRoZXkgY2FsbCBtZS4uLiBkYXRhXFxcXEFuZ3VzLTE2U1xcXFwxNlMtZGFkYTJfbm9jaGltX3RheC5jc3ZcIilcbk1ldGFHXzIgPC0gcmVhZF9jc3YoXCJDOlxcXFxVc2Vyc1xcXFxhbmd1c1xcXFxPbmVEcml2ZSAtIFVOQkNcXFxcQW5ndXMgQmFsbFxcXFxMYWIgd29ya1xcXFxVTFRSQVxcXFxUaGV5IGNhbGwgbWUuLi4gZGF0YVxcXFxBbmd1cy0xNlNcXFxcUmVkb25lIG1hc3Rlcm1peCBzdHVmZlxcXFwxNlNfUmVmSW5vY3VsdW1fZGFkYTJfbm9jaGltX3RheC5jc3ZcIilcblNlcV8xIDwtIHJlYWRfY3N2KFwiQzpcXFxcVXNlcnNcXFxcYW5ndXNcXFxcT25lRHJpdmUgLSBVTkJDXFxcXEFuZ3VzIEJhbGxcXFxcTGFiIHdvcmtcXFxcVUxUUkFcXFxcVGhleSBjYWxsIG1lLi4uIGRhdGFcXFxcQW5ndXMtMTZTXFxcXDE2Uy1zdl9zZXFzLmNzdlwiKVxuU2VxXzIgPC0gcmVhZF9jc3YoXCJDOlxcXFxVc2Vyc1xcXFxhbmd1c1xcXFxPbmVEcml2ZSAtIFVOQkNcXFxcQW5ndXMgQmFsbFxcXFxMYWIgd29ya1xcXFxVTFRSQVxcXFxUaGV5IGNhbGwgbWUuLi4gZGF0YVxcXFxBbmd1cy0xNlNcXFxcUmVkb25lIG1hc3Rlcm1peCBzdHVmZlxcXFwxNlNfUmVmSW5vY3VsdW1fc3Zfc2Vxcy5jc3ZcIilcblxuYGBgIn0= -->
-<pre class="r"><code>MetaG_1 &lt;- read_csv(&quot;C:\\Users\\angus\\OneDrive - UNBC\\Angus Ball\\Lab work\\ULTRA\\They call me... data\\Angus-16S\\16S-dada2_nochim_tax.csv&quot;)
-MetaG_2 &lt;- read_csv(&quot;C:\\Users\\angus\\OneDrive - UNBC\\Angus Ball\\Lab work\\ULTRA\\They call me... data\\Angus-16S\\Redone mastermix stuff\\16S_RefInoculum_dada2_nochim_tax.csv&quot;)
-Seq_1 &lt;- read_csv(&quot;C:\\Users\\angus\\OneDrive - UNBC\\Angus Ball\\Lab work\\ULTRA\\They call me... data\\Angus-16S\\16S-sv_seqs.csv&quot;)
-Seq_2 &lt;- read_csv(&quot;C:\\Users\\angus\\OneDrive - UNBC\\Angus Ball\\Lab work\\ULTRA\\They call me... data\\Angus-16S\\Redone mastermix stuff\\16S_RefInoculum_sv_seqs.csv&quot;)
-</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucGh5c2VxX0tleSA8LSByZWFkUkRTKGZpbGUgPSBcIkM6XFxcXFVzZXJzXFxcXGFuZ3VzXFxcXE9uZURyaXZlIC0gVU5CQ1xcXFxBbmd1cyBCYWxsXFxcXExhYiB3b3JrXFxcXEJpb2luZm9ybWF0aWNzXFxcXFVMVFJBXFxcXHBoeXNlcV9LZXlfbWVyZ2VkLnJkc1wiKVxuI0kgY2FuIHRlbGwgaXQgaGFzIHNlcXVlbmNlIGluZm9ybWF0aW9uIGJ5IHRoaXNcbnBoeXNlcV9LZXlcbmBgYCJ9 -->
+<pre class="r"><code>physeq_Key &lt;- readRDS(file = &quot;C:\\Users\\angus\\OneDrive - UNBC\\Angus Ball\\Lab work\\Bioinformatics\\ULTRA\\physeq_Key_merged.rds&quot;)
+#I can tell it has sequence information by this
+physeq_Key</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Congrats! We now have the data in R, you may have noticed I’ve
-actually read 2 separate sets of data, 1 and 2. You might not have two
-sets of data but I do!. We will then create phyloseq objects with both
-these datasets</p>
-<p>This is what the data looks like (the second copy is the same)</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaGVhZChNZXRhR18xKVxuYGBgIn0= -->
-<pre class="r"><code>head(MetaG_1)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbInRibF9kZiIsInRibCIsImRhdGEuZnJhbWUiXSwibnJvdyI6NiwibmNvbCI6ODEsInN1bW1hcnkiOnsiQSB0aWJibGUiOlsiNiDDlyA4MSJdfX0sInJkZiI6Ikg0c0lBQUFBQUFBQUJ0V2FRVzhiUlJUSHQwN2lxcFphSXZYQ0FSUkhJQTZvdHV4ZEo1Q2cwa2tDVVh0bzVOQ21pb1NFdTluZDJLdXVkMWU3NjlRSklPeW1XSWdFRVhIcUJRbStRWTRjT09USU1SK2hCdzRjT1NJT0RiUDJyck96bnAyWm5UZ0lSa295Yi94KzcvL2UyeGtuWStXVGp6YWwzR1pPRUlRSllYSWlJMHhNd2Frd3RmRnd0ZkMrSUV4bW9IRkZtQlN1K1QvYjBPa21uS3pEcjJuNGxRMWVtSHp3cUZhS3pNdVJ1UmlaUzVGNUpUS2Znejl2OU9NRkE2Z3ZCZHdBSDNmaVN3aVhZb3lGQTkxTnJCUDRpazhQMVBrNHpPaHo0QjJLWHJ0RTFBUGQ0MVI2ck02SmVoMThQM24xd0djbmZOek9NUmVIR1doOWU0L3hldldSZFpSN2J1TzVwMGRFTG1tQUxZcmVweWQ0enZpSlQrK0xVejZ1T2JJMG51ZXcxT0hqM0drdUxzVVlUMzJmQTZ3VDhCNlR1YS8vd25QV1N6SjNrUEErdUh0SzVucS80Ym51TkpFYjhUOTRrZlRTNEgzd2gxOVIvNk5iU2Y0bzE3SlI3dGt4RzNlSTd5T05HK3JFMGdOVml0NzMrTHpBczEvSTNLR041dzVmSjNJai90MC9FeE5FOUhhcUtQY2xJN2Qvc1g0TzliNDVadE5MZU02Z2U1Zk05ZkI5QXoxQTVFYjhYNmpFSklkNjN6VVM5UDRnYy90NGpxWkhjd0ppZ3Q2MytIMEkxRTRxUGFDYzBGSWc3bXNxOXp6aC9hZ05pRnhhc2FGZUw0L1g2NUwxd0VFYjlkOC9aZEpqem82VEF6Lyt6c2Y5UE55djZiaU5EaGNYR2Y5T1g5N201Tzd4Y1pIeG4rWkFCYytCdGM2bDZDVng0RU0ramxjdkxRZDZpYi9ITDBYdi84SUJ0OFBIbVp6YzBSdEVwNlRmZjJuRkxzQk5DK2VmeSt3OXFkV1daY1hUSEYxZXRHdTFKY1hUVFdzclhGRkdWcXh3cGJtcmFKNXNhTzdpZHExMlgxY2NTN0VVUlZZMFdWdXNReWZIYXpnQnR1aldhcmE3cThBRkF5NVlka00zV202UXdWb3NnelhkY3l6WDFoMFlSNG1hdnZTNUZRaVhwUEpDWVg1SkxQdWF2azRRRmNTaXJqUU15N0cyRGEydDk0c3laUTBtbzV0K3RqRHV5dXB5UVp6M0ExNVNuTXVwVW81Rkhjd3RYZFU4Q0NxUmhjR1RHNXBoNFBPRjhMbWRoM0Q3UXVqbmUxT20zTlRjWUErdEI0dVpCNCtDV1hibDduSzVHbjYyZDNWZ2xWQXo5cXFJbWhKcVZsQnpEdEVSRVV0Q3JBcGlvZHc4WWkyRUVxdHJNTmRsS1dxV1VWTkVUUWsxSzZnNWg1cnpRelBybTRnbElwYUVXQlhFbWtNc05PWjdpTFV3dE42OTN6SjFSYmRsSTY5WVRkdHl2VUs1VkZqVkhIaDY5VDFOTGR3ekxhVmx5SjZtQnNRdEdyRmg2bXpNaHJsTjBDblNHWXdTcmg0eGRUMGlSejBpUnowaVR6MWlPVzA5S01GV0QyUlMxeE5uTUVvZmpGQjUyVlR6dGlaNythYmU5bHFPUnR1QXQxT0h3T1RCR0lUY2dqc2NRWGg3UXQ3RVRPWFFkalZqa0RIMGhMN3ZXWHBDT1FnczVWQlBCbU9RaS9lRTRlemNyanA2VTNaMjg2N1JVdXRhUDhhV2JybndUd3pWWlQwOWR6aUNZSEpoRGtQdXpCSlhHUDdla0U4UlkxRzBjOFFjWml5OW9aOGx0dDVRVGhOYlVkVHp4QnhtSEwxaE9GTnZWdUVocEoyWkdZd1RKdGJRalp6N0xOWXRPVGZ5bnAzQk9DWG5SdHR6czFpM3hOd29lMllHNDVTWUcvV1p6MkxkTVBGbUg4bzZ2SFhWM1VLSm5OOWJDWTZZbUlnck9jK2NKN2VMT3hxOHlqcXhDOUkxeDNwYURDOUoxLzNMVVFkK096czcrenQrazFJTTJRMXZVdUZpVHBVOXVianRRQjVhcjJMSVZjdjJkTXVFVU9hbU1MajZSK0VyVG16aHRaYnBaNklXbEViTGZGS1FZaTlQMktiL3Z3UzUvdEpnWEEvbTJjaDhmWkJGNWt4QVB6bklhbVlkM252RGNneDVTelBDeUtxMkUweHZ3SDcwMjFHMEhkMzB3anJocWx2MExOamdjRVd4akhDbFg3bnc2aDgxQmNwbGR5SUFBQT09In0= -->
-<div data-pagedtable="false">
-<script data-pagedtable-source type="application/json">
-{"columns":[{"label":["SV"],"name":[1],"type":["chr"],"align":["left"]},{"label":["CHB1P1"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["CHB1P10"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["CHB1P11"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["CHB1P12"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["CHB1P13"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["CHB1P14"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["CHB1P15"],"name":[8],"type":["dbl"],"align":["right"]},{"label":["CHB1P2"],"name":[9],"type":["dbl"],"align":["right"]},{"label":["CHB1P3"],"name":[10],"type":["dbl"],"align":["right"]},{"label":["CHB1P4"],"name":[11],"type":["dbl"],"align":["right"]},{"label":["CHB1P5"],"name":[12],"type":["dbl"],"align":["right"]},{"label":["CHB1P6"],"name":[13],"type":["dbl"],"align":["right"]},{"label":["CHB1P9"],"name":[14],"type":["dbl"],"align":["right"]},{"label":["FNP10B3"],"name":[15],"type":["dbl"],"align":["right"]},{"label":["FNP11B3"],"name":[16],"type":["dbl"],"align":["right"]},{"label":["FNP12B3"],"name":[17],"type":["dbl"],"align":["right"]},{"label":["FNP13B3"],"name":[18],"type":["dbl"],"align":["right"]},{"label":["FNP14B3"],"name":[19],"type":["dbl"],"align":["right"]},{"label":["FNP15B3"],"name":[20],"type":["dbl"],"align":["right"]},{"label":["FNP16B3"],"name":[21],"type":["dbl"],"align":["right"]},{"label":["FNP1B3"],"name":[22],"type":["dbl"],"align":["right"]},{"label":["FNP2B3"],"name":[23],"type":["dbl"],"align":["right"]},{"label":["FNP3B3"],"name":[24],"type":["dbl"],"align":["right"]},{"label":["FNP4B3"],"name":[25],"type":["dbl"],"align":["right"]},{"label":["FNP5B3"],"name":[26],"type":["dbl"],"align":["right"]},{"label":["FNP6B3"],"name":[27],"type":["dbl"],"align":["right"]},{"label":["FNP7B3"],"name":[28],"type":["dbl"],"align":["right"]},{"label":["FNP9B3"],"name":[29],"type":["dbl"],"align":["right"]},{"label":["Municipal compost-10-Fertalized-Inoculated"],"name":[30],"type":["dbl"],"align":["right"]},{"label":["Municipal compost-10-Fertalized-Uninoculated"],"name":[31],"type":["dbl"],"align":["right"]},{"label":["Municipal compost-10-Unfertalized-Inoculated"],"name":[32],"type":["dbl"],"align":["right"]},{"label":["Municipal compost-10-Unfertalized-Uninoculated"],"name":[33],"type":["dbl"],"align":["right"]},{"label":["Municipal compost-12-Fertalized-Inoculated"],"name":[34],"type":["dbl"],"align":["right"]},{"label":["Municipal compost-12-Fertalized-Uninoculated"],"name":[35],"type":["dbl"],"align":["right"]},{"label":["Municipal compost-12-Unfertalized-Inoculated"],"name":[36],"type":["dbl"],"align":["right"]},{"label":["Municipal compost-12-Unfertalized-Uninoculated"],"name":[37],"type":["dbl"],"align":["right"]},{"label":["Municipal compost-21-Fertalized-Inoculated"],"name":[38],"type":["dbl"],"align":["right"]},{"label":["Municipal compost-21-Fertalized-Uninoculated"],"name":[39],"type":["dbl"],"align":["right"]},{"label":["Municipal compost-21-Unfertalized-Inoculated"],"name":[40],"type":["dbl"],"align":["right"]},{"label":["Municipal compost-21-Unfertalized-Uninoculated"],"name":[41],"type":["dbl"],"align":["right"]},{"label":["Municipal compost and peat mixture-10-Fertalized-Inoculated"],"name":[42],"type":["dbl"],"align":["right"]},{"label":["Municipal compost and peat mixture-10-Fertalized-Uninoculated"],"name":[43],"type":["dbl"],"align":["right"]},{"label":["Municipal compost and peat mixture-10-Unfertalized-Inoculated"],"name":[44],"type":["dbl"],"align":["right"]},{"label":["Municipal compost and peat mixture-10-Unfertalized-Uninoculated"],"name":[45],"type":["dbl"],"align":["right"]},{"label":["Municipal compost and peat mixture-12-Fertalized-Inoculated"],"name":[46],"type":["dbl"],"align":["right"]},{"label":["Municipal compost and peat mixture-12-Fertalized-Uninoculated"],"name":[47],"type":["dbl"],"align":["right"]},{"label":["Municipal compost and peat mixture-12-Unfertalized-Inoculated"],"name":[48],"type":["dbl"],"align":["right"]},{"label":["Municipal compost and peat mixture-12-Unfertalized-Uninoculated"],"name":[49],"type":["dbl"],"align":["right"]},{"label":["Municipal compost and peat mixture-21-Fertalized-Inoculated"],"name":[50],"type":["dbl"],"align":["right"]},{"label":["Municipal compost and peat mixture-21-Fertalized-Uninoculated"],"name":[51],"type":["dbl"],"align":["right"]},{"label":["Municipal compost and peat mixture-21-Unfertalized-Inoculated"],"name":[52],"type":["dbl"],"align":["right"]},{"label":["Municipal compost and peat mixture-21-Unfertalized-Uninoculated"],"name":[53],"type":["dbl"],"align":["right"]},{"label":["Primary sludge and biosolids mixture-10-Fertalized-Inoculated"],"name":[54],"type":["dbl"],"align":["right"]},{"label":["Primary sludge and biosolids mixture-10-Fertalized-Uninoculated"],"name":[55],"type":["dbl"],"align":["right"]},{"label":["Primary sludge and biosolids mixture-10-Unfertalized-Inoculated"],"name":[56],"type":["dbl"],"align":["right"]},{"label":["Primary sludge and biosolids mixture-10-Unfertalized-Uninoculated"],"name":[57],"type":["dbl"],"align":["right"]},{"label":["Primary sludge and biosolids mixture-12-Fertalized-Inoculated"],"name":[58],"type":["dbl"],"align":["right"]},{"label":["Primary sludge and biosolids mixture-12-Fertalized-Uninoculated"],"name":[59],"type":["dbl"],"align":["right"]},{"label":["Primary sludge and biosolids mixture-12-Unfertalized-Inoculated"],"name":[60],"type":["dbl"],"align":["right"]},{"label":["Primary sludge and biosolids mixture-12-Unfertalized-Uninoculated"],"name":[61],"type":["dbl"],"align":["right"]},{"label":["Primary sludge and biosolids mixture-21-Fertalized-Inoculated"],"name":[62],"type":["dbl"],"align":["right"]},{"label":["Primary sludge and biosolids mixture-21-Fertalized-Uninoculated"],"name":[63],"type":["dbl"],"align":["right"]},{"label":["Primary sludge and biosolids mixture-21-Unfertalized-Inoculated"],"name":[64],"type":["dbl"],"align":["right"]},{"label":["Primary sludge and biosolids mixture-21-Unfertalized-Uninoculated"],"name":[65],"type":["dbl"],"align":["right"]},{"label":["Peat-10-Fertalized-Inoculated"],"name":[66],"type":["dbl"],"align":["right"]},{"label":["Peat-10-Fertalized-Uninoculated"],"name":[67],"type":["dbl"],"align":["right"]},{"label":["Peat-10-Unfertalized-Inoculated"],"name":[68],"type":["dbl"],"align":["right"]},{"label":["Peat-10-Unfertalized-Uninoculated"],"name":[69],"type":["dbl"],"align":["right"]},{"label":["Peat-12-Fertalized-Inoculated"],"name":[70],"type":["dbl"],"align":["right"]},{"label":["Peat-12-Fertalized-Uninoculated"],"name":[71],"type":["dbl"],"align":["right"]},{"label":["Peat-12-Unfertalized-Inoculated"],"name":[72],"type":["dbl"],"align":["right"]},{"label":["Peat-12-Unfertalized-Uninoculated"],"name":[73],"type":["dbl"],"align":["right"]},{"label":["Peat-21-Fertalized-Inoculated"],"name":[74],"type":["dbl"],"align":["right"]},{"label":["Peat-21-Fertalized-Uninoculated"],"name":[75],"type":["dbl"],"align":["right"]},{"label":["Peat-21-Unfertalized-Inoculated"],"name":[76],"type":["dbl"],"align":["right"]},{"label":["Peat-21-Unfertalized-Uninoculated"],"name":[77],"type":["dbl"],"align":["right"]},{"label":["Tailings-01-Fertalized-Inoculated"],"name":[78],"type":["dbl"],"align":["right"]},{"label":["Tailings-01-Fertalized-Uninoculated"],"name":[79],"type":["dbl"],"align":["right"]},{"label":["Tailings-01-Unfertalized-Inoculated"],"name":[80],"type":["dbl"],"align":["right"]},{"label":["tax.vector"],"name":[81],"type":["chr"],"align":["left"]}],"data":[{"1":"SV_0","2":"0","3":"0","4":"0","5":"0","6":"0","7":"0","8":"11","9":"0","10":"0","11":"0","12":"0","13":"0","14":"0","15":"0","16":"0","17":"0","18":"0","19":"0","20":"0","21":"0","22":"0","23":"0","24":"0","25":"0","26":"0","27":"0","28":"0","29":"0","30":"0","31":"1199","32":"343","33":"927","34":"0","35":"1014","36":"910","37":"0","38":"357","39":"639","40":"0","41":"598","42":"707","43":"0","44":"941","45":"621","46":"0","47":"855","48":"0","49":"910","50":"665","51":"0","52":"708","53":"879","54":"0","55":"0","56":"0","57":"0","58":"0","59":"0","60":"0","61":"0","62":"0","63":"0","64":"0","65":"0","66":"0","67":"0","68":"0","69":"0","70":"0","71":"727","72":"0","73":"0","74":"0","75":"0","76":"312","77":"244","78":"1031","79":"0","80":"0","81":"k__Bacteria:p__Actinobacteria:c__Actinobacteria:o__Actinomycetales:f__Micrococcaceae:g__Arthrobacter:s__psychrolactophilus"},{"1":"SV_1","2":"167","3":"0","4":"0","5":"555","6":"0","7":"0","8":"0","9":"566","10":"0","11":"523","12":"0","13":"0","14":"0","15":"422","16":"654","17":"0","18":"111","19":"0","20":"0","21":"0","22":"35","23":"305","24":"0","25":"0","26":"436","27":"703","28":"875","29":"729","30":"0","31":"0","32":"0","33":"0","34":"14","35":"0","36":"0","37":"0","38":"0","39":"0","40":"0","41":"0","42":"0","43":"0","44":"0","45":"0","46":"0","47":"0","48":"0","49":"0","50":"0","51":"0","52":"0","53":"0","54":"0","55":"0","56":"0","57":"0","58":"0","59":"0","60":"0","61":"0","62":"0","63":"0","64":"0","65":"0","66":"61","67":"0","68":"30","69":"0","70":"0","71":"0","72":"0","73":"0","74":"0","75":"0","76":"0","77":"0","78":"0","79":"0","80":"0","81":"k__Bacteria:p__Nitrospirae:c__Nitrospira:o__Nitrospirales:f__0319-6A21:g__:s__"},{"1":"SV_2","2":"0","3":"0","4":"0","5":"0","6":"0","7":"0","8":"0","9":"0","10":"0","11":"0","12":"0","13":"0","14":"0","15":"0","16":"0","17":"0","18":"0","19":"0","20":"0","21":"0","22":"0","23":"0","24":"0","25":"0","26":"0","27":"0","28":"0","29":"0","30":"0","31":"1035","32":"598","33":"0","34":"0","35":"0","36":"0","37":"574","38":"479","39":"0","40":"790","41":"0","42":"0","43":"1561","44":"0","45":"0","46":"0","47":"0","48":"158","49":"0","50":"0","51":"0","52":"0","53":"634","54":"0","55":"0","56":"0","57":"0","58":"0","59":"0","60":"0","61":"0","62":"0","63":"0","64":"0","65":"0","66":"0","67":"0","68":"0","69":"0","70":"0","71":"0","72":"0","73":"0","74":"0","75":"0","76":"0","77":"0","78":"0","79":"0","80":"0","81":"k__Bacteria:p__Chloroflexi:c__Anaerolineae:o__CFB-26:f__:g__:s__"},{"1":"SV_3","2":"0","3":"0","4":"0","5":"0","6":"0","7":"0","8":"0","9":"0","10":"0","11":"0","12":"0","13":"0","14":"0","15":"0","16":"0","17":"0","18":"0","19":"0","20":"0","21":"0","22":"0","23":"0","24":"0","25":"0","26":"0","27":"0","28":"0","29":"0","30":"883","31":"0","32":"0","33":"0","34":"64","35":"599","36":"899","37":"0","38":"0","39":"0","40":"0","41":"553","42":"712","43":"0","44":"733","45":"0","46":"0","47":"164","48":"0","49":"0","50":"388","51":"0","52":"552","53":"0","54":"0","55":"0","56":"0","57":"0","58":"0","59":"0","60":"0","61":"0","62":"0","63":"0","64":"0","65":"0","66":"0","67":"0","68":"0","69":"0","70":"0","71":"0","72":"0","73":"0","74":"0","75":"0","76":"0","77":"0","78":"0","79":"0","80":"0","81":"k__Bacteria:p__Chloroflexi:c__Anaerolineae:o__CFB-26:f__:g__:s__"},{"1":"SV_4","2":"43","3":"0","4":"0","5":"496","6":"184","7":"0","8":"387","9":"0","10":"0","11":"0","12":"123","13":"363","14":"0","15":"187","16":"377","17":"147","18":"229","19":"461","20":"232","21":"0","22":"0","23":"0","24":"0","25":"0","26":"326","27":"255","28":"413","29":"546","30":"0","31":"0","32":"0","33":"0","34":"0","35":"0","36":"0","37":"0","38":"0","39":"0","40":"0","41":"0","42":"0","43":"0","44":"0","45":"0","46":"18","47":"0","48":"0","49":"0","50":"0","51":"0","52":"0","53":"0","54":"0","55":"0","56":"0","57":"0","58":"0","59":"0","60":"0","61":"0","62":"0","63":"0","64":"0","65":"0","66":"0","67":"0","68":"0","69":"0","70":"0","71":"0","72":"0","73":"0","74":"0","75":"0","76":"0","77":"0","78":"18","79":"0","80":"0","81":"k__Bacteria:p__Nitrospirae:c__Nitrospira:o__Nitrospirales:f__0319-6A21:g__:s__"},{"1":"SV_5","2":"0","3":"0","4":"0","5":"0","6":"0","7":"0","8":"0","9":"0","10":"0","11":"0","12":"0","13":"0","14":"0","15":"0","16":"0","17":"0","18":"0","19":"0","20":"0","21":"0","22":"0","23":"0","24":"0","25":"0","26":"0","27":"0","28":"0","29":"0","30":"0","31":"0","32":"0","33":"0","34":"0","35":"0","36":"0","37":"0","38":"0","39":"0","40":"0","41":"0","42":"0","43":"0","44":"0","45":"0","46":"0","47":"0","48":"0","49":"0","50":"0","51":"0","52":"0","53":"0","54":"0","55":"1913","56":"2292","57":"86","58":"0","59":"0","60":"10","61":"50","62":"0","63":"0","64":"0","65":"20","66":"0","67":"0","68":"0","69":"0","70":"0","71":"0","72":"0","73":"0","74":"0","75":"0","76":"0","77":"0","78":"0","79":"0","80":"0","81":"k__Bacteria:p__Bacteroidetes:c__Bacteroidia:o__Bacteroidales:f__Bacteroidaceae:g__Bacteroides:s__"}],"options":{"columns":{"min":{},"max":[10],"total":[81]},"rows":{"min":[10],"max":[10],"total":[6]},"pages":{}}}
-  </script>
-</div>
-<!-- rnb-frame-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaGVhZChTZXFfMSlcbmBgYCJ9 -->
-<pre class="r"><code>head(Seq_1)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbInRibF9kZiIsInRibCIsImRhdGEuZnJhbWUiXSwibnJvdyI6NiwibmNvbCI6Miwic3VtbWFyeSI6eyJBIHRpYmJsZSI6WyI2IMOXIDIiXX19LCJyZGYiOiJINHNJQUFBQUFBQUFCdVdWVFc4VFFReUdwNXNQMUVnRnBQNk9SRUNMeE5VeVlvNUkxRVc5b1NWWlNrVFloQ1FGanZ4dGNtaHF2NTRKMDRVckVoS1JzdXV4eCsvWXo4N092bmw1ZFRhNkdvVVFlcUhmcTBKdm9HWVlYTXFyOFlzUStwVU9qa0kvSE52OXUwNDZWY09jai9VL1RJSCt4ZHQzVHdyN2FXRS9LK3l6d2o0djdPY2R2UjFIb1JnalJ5YlNxd2dKYzR4RVpna2lRaHJTb1BoY2pZcEdkS1JqbHFqVEpkb1VKRWFiUjhTdWdyak9WN2VRUlZtVldFeE9jOFRYanZENW1td0cvRWhUV1VGdE9sbkZ5T2FxazBuVk5hSWhJb2hhSll4eXJYQ1QwK1hzYWhtTTh0Z1M4bEJURW9HZlZnenFUZ0RRcUFQZ0FnQVlaUUMrT0hxMnBWT2x6RWhOQUxDMnhSZzNncHpCMGtKVFVOQlpCd0QvQmdCRGdrb0pJUDRDRUVzQUNlTUJBR2NBTVFQUWthWmtBR2lLTUt2Y0FkSUJ3REU5d1BSRWRWWUNRSGtIc0plZkFhQXg1eU1vd2VXc0xvZXVZc255NHJ6MENIbkNHbmtIWkFCY0FDQnZMZ0ZRVlhaOW8xb0M0QU9Bdk4yd0F3NEEwanZ3SHhQNFcrOEFwMUk3NzREOGMrL0FMbEgxSjlyWkFqZ0d6UUFCU2dTc2ZyWlRDUVFJWGZreEtEanFNZ0d2SDExYUNnaUlOZVFFYk1Ea3V3UjhuVUQ4d3pFb2tvOUJkT3lIckd2blk5QVdCUUZYQllGMEZMRnZRRk5GV0VCQWo4SDdYNTVCVzM5dU51a3JVU1ZuNy9XbFpQT2krZEpKT1Y0dnYwMXkyb21sL2RETGZyL2ZkYlduaTNxVHRiTnpOS3UzOWVURFd2TjFkTnRKZWJCY2JlZkxWcE9xVTN5MjdpY2ZyVHVPUnpldFZUSWJUei9ldEovRzU1MXdiOVZlMjVwdytlOGsyY1BDcnJ5S2F0LzVXZzZiOW5yZU5ybWRSZjIrV1dUbFdmTTFtUStWQjNCTVZ1dDV1ODE5cW5jejJTNjNkVTRaVFplTDdFSG40ZllPQWN2OWpTTUlBQUE9In0= -->
-<div data-pagedtable="false">
-<script data-pagedtable-source type="application/json">
-{"columns":[{"label":["OUT"],"name":[1],"type":["chr"],"align":["left"]},{"label":["Seq"],"name":[2],"type":["chr"],"align":["left"]}],"data":[{"1":"SV_0","2":"CGTAGGGCGCAAGCGTTATCCGGAATTATTGGGCGTAAAGAGCTCGTAGGCGGTTTGTCGCGTCTGCCGTGAAAGTCCGGGGCTCAACTCCGGATCTGCGGTGGGTACGGGCAGACTAGAGTGATGTAGGGGAGACTGGAATTCCTGGTGTAGCGGTGAAATGCGCAGATATCAGGAGGAACACCGATGGCGAAGGCAGGTCTCTGGGCATTAACTGACGCTGAGGAGCGAAAGCATGGGGAGCGAACAG"},{"1":"SV_1","2":"AGAGGGGGCAAGCGTTGCTCGGAATTACTGGGCGTAAAGGGCGCGTAGGCGGGATGGCAAGTCGGTCGTGAAATCCCTCGGCTCAACTGAGGATCGTCGATCGATACTGCCGTTCTTGAGGATTGCAGAGGAGACTGGAATTCCCGGTGTAGCGGTGAAATGTGTAGAGATCGGGAGGAACACCGGTGGCGAAGGCGGGTCTCTGGGCAATTCCTGACGCTGAGGCGCGAAAGCGTGGGGAGCAAACGG"},{"1":"SV_2","2":"GTAGGACGCGAGCGTTATCCGGATTTACTGGGCGTAAAGCGCGGGCAGGCGGTGGTCCAAGTCGGACGTGAAAGCTCCCGGCTCAACTGGGAGAGGTCGTTCGAAACTGGGCCGCTAGAGGGCAGTAGAGGGGCGTGGAATTCCGGGTGGAGTGGTGAAATGCGTAGAGATCCGGAGGAACACCAGAGGCGAAGGCGGCGCCCTGGGCTGCACCTGACGCTGAGCCGCGAAAGCTAGGGGAGCGAACGG"},{"1":"SV_3","2":"CGTAGGACGCGAGCGTTATCCGGATTTACTGGGCGTAAAGCGCGGGCAGGCGGTGGTCCAAGTCGGACGTGAAAGCTCCCGGCTCAACTGGGAGAGGTCGTTCGAAACTGGGCCGCTAGAGGGCAGTAGAGGGGCGTGGAATTCCGGGTGGAGTGGTGAAATGCGTAGAGATCCGGAGGAACACCAGAGGCGAAGGCGGCGCCCTGGGCTGCACCTGACGCTGAGCCGCGAAAGCTAGGGGAGCGAACGG"},{"1":"SV_4","2":"AGAGGGGGCAAGCGTTGCTCGGAATTACTGGGCGTAAAGGGCGCGTAGGCGGGATGGCAAGTCGGTCGTGAAATCCCTCGGCTCAACCGAGGAACGTCGATCGATACTGCTGTTCTTGAGGATTGCAGAGGAGACTGGAATTCCCGGTGTAGCGGTGAAATGTGTAGAGATCGGGAGGAACACCGGTGGCGAAGGCGGGTCTCTGGGCAATTCCTGACGCTGAGGCGCGAAAGCGTGGGGAGCAAACGG"},{"1":"SV_5","2":"CGGAGGATCCAAGCGTTATCCGGATTTATTGGGTTTAAAGGGAGCGTAGGTTGACATATAAGTCAGCTGTGAAAGTTTACGGCTCAACCGTGAAATTGCAGTTGATACTGTATGTCTTGAGTGTACAAGAGGTGGGCGGAATTCGTGGTGTAGCGGTGAAATGCTTAGATATCACGAAGAACTCCAATTGCGAAGGCAGCTCACTGGGGTACAACTGACACTGAGGCTCGAAAGTGTGGGTATCAAACAG"}],"options":{"columns":{"min":{},"max":[10],"total":[2]},"rows":{"min":[10],"max":[10],"total":[6]},"pages":{}}}
-  </script>
-</div>
-<!-- rnb-frame-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>We’ll start by concatenating all these tables! The MetaG tables are
-OTU tables, with count and species data, the Seq tables are the exact
-ASVs for each sequence. Since we want to combine these tables we must
-make sure that the ASV’s exactly match each other</p>
-<p>So,</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuTWV0YUdfMV90b3RhbCA8LSBjYmluZChNZXRhR18xLCBTZXFfMSRTZXEpXG5NZXRhR18yX3RvdGFsIDwtIGNiaW5kKE1ldGFHXzIsIFNlcV8yJFNlcSlcblxuYGBgIn0= -->
-<pre class="r"><code>MetaG_1_total &lt;- cbind(MetaG_1, Seq_1$Seq)
-MetaG_2_total &lt;- cbind(MetaG_2, Seq_2$Seq)
-</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Then we have to remove the SVs so there isnt multiple of the same
-value in the final table</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI3JlbW92ZSB0aGUgc1YgdmFsdWVcbk1ldGFHXzFfdG90YWwgPC0gc2VsZWN0KE1ldGFHXzFfdG90YWwsIC0oMSkpXG5NZXRhR18yX3RvdGFsIDwtIHNlbGVjdChNZXRhR18yX3RvdGFsLCAtKDEpKVxuXG5gYGAifQ== -->
-<pre class="r"><code>#remove the sV value
-MetaG_1_total &lt;- select(MetaG_1_total, -(1))
-MetaG_2_total &lt;- select(MetaG_2_total, -(1))
-</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Then we can combine these two tables based on the ASV data is Seq,
-BUT to make sure we dont loose anything lets find out the amount of
-counts per row. Im just going to spot check two</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3VtKE1ldGFHXzFfdG90YWwkYE11bmljaXBhbCBjb21wb3N0LTEwLUZlcnRhbGl6ZWQtSW5vY3VsYXRlZGApXG5gYGAifQ== -->
-<pre class="r"><code>sum(MetaG_1_total$`Municipal compost-10-Fertalized-Inoculated`)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDIwNjkwXG4ifQ== -->
-<pre><code>[1] 20690</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3VtKE1ldGFHXzJfdG90YWwkTWFzdGVyTWl4KVxuYGBgIn0= -->
-<pre class="r"><code>sum(MetaG_2_total$MasterMix)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDIyNjUxXG4ifQ== -->
-<pre><code>[1] 22651</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>okay time to combine them</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuTWV0YUcgPC0gbWVyZ2UoTWV0YUdfMV90b3RhbCwgTWV0YUdfMl90b3RhbCwgYnkueCA9IFwiU2VxXzEkU2VxXCIsIGJ5LnkgPSBcIlNlcV8yJFNlcVwiLCBhbGwueCA9IFRSVUUsIGFsbC55ID0gVFJVRSlcbmBgYCJ9 -->
-<pre class="r"><code>MetaG &lt;- merge(MetaG_1_total, MetaG_2_total, by.x = &quot;Seq_1$Seq&quot;, by.y = &quot;Seq_2$Seq&quot;, all.x = TRUE, all.y = TRUE)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Lets check those sums again!</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3VtKE1ldGFHJGBNdW5pY2lwYWwgY29tcG9zdC0xMC1GZXJ0YWxpemVkLUlub2N1bGF0ZWRgKVxuYGBgIn0= -->
-<pre class="r"><code>sum(MetaG$`Municipal compost-10-Fertalized-Inoculated`)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIE5BXG4ifQ== -->
-<pre><code>[1] NA</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3VtKE1ldGFHJE1hc3Rlck1peClcbmBgYCJ9 -->
-<pre class="r"><code>sum(MetaG$MasterMix)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIE5BXG4ifQ== -->
-<pre><code>[1] NA</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Thats because in the merge step a bunch of NA’s were added on rows
-not seen in both samples, we can just set those NA’s to 0</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuTWV0YUdbaXMubmEoTWV0YUcpXTwtMFxuYGBgIn0= -->
-<pre class="r"><code>MetaG[is.na(MetaG)]&lt;-0</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3VtKE1ldGFHJGBNdW5pY2lwYWwgY29tcG9zdC0xMC1GZXJ0YWxpemVkLUlub2N1bGF0ZWRgKVxuYGBgIn0= -->
-<pre class="r"><code>sum(MetaG$`Municipal compost-10-Fertalized-Inoculated`)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDIwNjkwXG4ifQ== -->
-<pre><code>[1] 20690</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3VtKE1ldGFHJE1hc3Rlck1peClcbmBgYCJ9 -->
-<pre class="r"><code>sum(MetaG$MasterMix)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDIyNjUxXG4ifQ== -->
-<pre><code>[1] 22651</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Perfect same as before so there was no data loss!</p>
-<p>Lets just clean up the table a bit</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI2ZpcnN0IHNlcGVyYXRlIHRoZSBBU1YncyBpbnRvIGEgbmV3IHRhYmxlXG5hc3ZzIDwtIHNlbGVjdChNZXRhRywgXCJTZXFfMSRTZXFcIilcbk1ldGFHIDwtIHNlbGVjdChNZXRhRywgLVwiU2VxXzEkU2VxXCIpICN0aGVuIHJlbW92ZSB0aGVtIGZyb20gdGhlIHRhYmxlXG4jbGV0cyBzZXBlcmF0ZSB0aGUgdGF4YSB2YWx1ZXNcblRheF90ZW1wPC1zZWxlY3QoTWV0YUcsIGMoXCJ0YXgudmVjdG9yLnhcIiwgXCJ0YXgudmVjdG9yLnlcIikpXG4jdGhlbiBsZXRzIHB1dCB0aGVtIGluIHRoZSBzYW1lIGNvbHVtbiwgc28gdGhhdCB0YXgudmVjdG9yLnggY29udGFpbnMgbm8gemVyb3MgYW5kIGhvbGRzIGFsbCB0aGUgZGF0YVxuVGF4X2ZpeGVkIDwtIFRheF90ZW1wICU+JVxuICBtdXRhdGUodGF4LnZlY3Rvci54ID0gaWZlbHNlKHRheC52ZWN0b3IueCA9PSAwLCB0YXgudmVjdG9yLnksdGF4LnZlY3Rvci54KSkjc3Bva2VuLCBpZiB0YXgueCBjb250YWlucyBhIHplcm8gcmVwbGFjZSB3aXRoIHZhbHVlIGZyb20gdGF4LnkgKHdoaWNoIHdlIGtub3cgaGFzIHRvIGhhdmUgYSB2YWx1ZSBpZiB0YXgueCBkb2Vzbid0KVxuI3JlbmFtZVxuVGF4X2ZpeGVkIDwtIHNlbGVjdChUYXhfZml4ZWQsIC1cInRheC52ZWN0b3IueVwiKVxuYGBgIn0= -->
-<pre class="r"><code>#first seperate the ASV&#39;s into a new table
-asvs &lt;- select(MetaG, &quot;Seq_1$Seq&quot;)
-MetaG &lt;- select(MetaG, -&quot;Seq_1$Seq&quot;) #then remove them from the table
-#lets seperate the taxa values
-Tax_temp&lt;-select(MetaG, c(&quot;tax.vector.x&quot;, &quot;tax.vector.y&quot;))
-#then lets put them in the same column, so that tax.vector.x contains no zeros and holds all the data
-Tax_fixed &lt;- Tax_temp %&gt;%
-  mutate(tax.vector.x = ifelse(tax.vector.x == 0, tax.vector.y,tax.vector.x))#spoken, if tax.x contains a zero replace with value from tax.y (which we know has to have a value if tax.x doesn&#39;t)
-#rename
-Tax_fixed &lt;- select(Tax_fixed, -&quot;tax.vector.y&quot;)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI1RoZW4gd2UgY2FuIGZ1bGx5IGNsZWFuIHVwIHRoZSBtZXRhRyB0YWJsZVxuTWV0YUcgPC0gTWV0YUcgJT4lXG4gIHNlbGVjdCgtXCJ0YXgudmVjdG9yLnhcIikgJT4lXG4gICAgICAgICAgIHNlbGVjdCgtXCJ0YXgudmVjdG9yLnlcIikgJT4lXG4gICAgICAgIHNlbGVjdCgtKFwiQ0hCMVAxXCI6XCJGTlA5QjNcIikpICNyZW1vdmluZyB0aGUgdGF4J3MgYmMgdGhleSBhcmUgaW4gdGF4X2ZpeGVkIG5vdywgYW5kIHJlbW92aW5nIHNhbXBsZXMgbm90IGFwcGxpY2FibGUgdG8gdGhpcyBkYXRhc2V0XG5cbmBgYCJ9 -->
-<pre class="r"><code>#Then we can fully clean up the metaG table
-MetaG &lt;- MetaG %&gt;%
-  select(-&quot;tax.vector.x&quot;) %&gt;%
-           select(-&quot;tax.vector.y&quot;) %&gt;%
-        select(-(&quot;CHB1P1&quot;:&quot;FNP9B3&quot;)) #removing the tax&#39;s bc they are in tax_fixed now, and removing samples not applicable to this dataset
-</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>First things first, we have to format the tables in a way that
-phyloseq is expecting them and unfortunately, this is a bit of a pain.
-Phyloseq expects a couple tables. First a count table (this is the MetaG
-table), A taxonomy table (This is tax.vector), and a sample data table
-(This ones based off of the group of data that exist in your sample)</p>
-<p>Lets first start by creating the taxonomy table from the MetaG
-tables!</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuVGF4PC1zZWxlY3QoVGF4X2ZpeGVkLCAoXCJ0YXgudmVjdG9yLnhcIikpIFxuYGBgIn0= -->
-<pre class="r"><code>Tax&lt;-select(Tax_fixed, (&quot;tax.vector.x&quot;)) </code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Oh bother! Phyloseq expects the taxonomy to be separated by taxons
-i.e. one column for kingdom, one for family ect. But everything is under
-one column. This means we have to deliminate again, and looking at the
-how to column is created from DADA2, we need to deliminate by colon</p>
-<p>cSplit deliminates within a column and then the rename functions make
-all the columns names phyloseq expects!</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuVGF4IDwtIGNTcGxpdChUYXgsIFwidGF4LnZlY3Rvci54XCIsIFwiOlwiKVxuYGBgIn0= -->
-<pre class="r"><code>Tax &lt;- cSplit(Tax, &quot;tax.vector.x&quot;, &quot;:&quot;)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiV2FybmluZzogJ2FzLmlzJyBzaG91bGQgYmUgc3BlY2lmaWVkIGJ5IHRoZSBjYWxsZXI7IHVzaW5nIFRSVUVXYXJuaW5nOiAnYXMuaXMnIHNob3VsZCBiZSBzcGVjaWZpZWQgYnkgdGhlIGNhbGxlcjsgdXNpbmcgVFJVRVdhcm5pbmc6ICdhcy5pcycgc2hvdWxkIGJlIHNwZWNpZmllZCBieSB0aGUgY2FsbGVyOyB1c2luZyBUUlVFV2FybmluZzogJ2FzLmlzJyBzaG91bGQgYmUgc3BlY2lmaWVkIGJ5IHRoZSBjYWxsZXI7IHVzaW5nIFRSVUVXYXJuaW5nOiAnYXMuaXMnIHNob3VsZCBiZSBzcGVjaWZpZWQgYnkgdGhlIGNhbGxlcjsgdXNpbmcgVFJVRVdhcm5pbmc6ICdhcy5pcycgc2hvdWxkIGJlIHNwZWNpZmllZCBieSB0aGUgY2FsbGVyOyB1c2luZyBUUlVFV2FybmluZzogJ2FzLmlzJyBzaG91bGQgYmUgc3BlY2lmaWVkIGJ5IHRoZSBjYWxsZXI7IHVzaW5nIFRSVUVcbiJ9 -->
-<pre><code>Warning: &#39;as.is&#39; should be specified by the caller; using TRUEWarning: &#39;as.is&#39; should be specified by the caller; using TRUEWarning: &#39;as.is&#39; should be specified by the caller; using TRUEWarning: &#39;as.is&#39; should be specified by the caller; using TRUEWarning: &#39;as.is&#39; should be specified by the caller; using TRUEWarning: &#39;as.is&#39; should be specified by the caller; using TRUEWarning: &#39;as.is&#39; should be specified by the caller; using TRUE</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuVGF4IDwtIGRwbHlyOjpyZW5hbWUoVGF4LFxuIEtpbmdkb20gPSAgdGF4LnZlY3Rvci54XzEsXG4gUGh5bHVtID0gdGF4LnZlY3Rvci54XzIsXG4gQ2xhc3MgPSB0YXgudmVjdG9yLnhfMyxcbiBPcmRlciA9IHRheC52ZWN0b3IueF80LFxuIEZhbWlseSA9IHRheC52ZWN0b3IueF81LFxuIEdlbnVzID0gdGF4LnZlY3Rvci54XzYsXG4gU3BlY2llcyA9IHRheC52ZWN0b3IueF83LFxuICBcbiAgKVxuXG4jb3VyIGRhdGFzZXRzIGtpbmRhIHdpYmJseSB3b2JibHkgYmVjYXVzZSB3ZSd2ZSBiZWVuIGFkZGluZyB0aGluZ3MgdG9nZXRoZXIsIHNvIHNvbWV0aW1lcyBpZiB0aGVyZSBpc250IGEgZGVzaWduYXRlZCB0YXhvbiBpdCB3cml0ZXMgTkEgYW5kIHNvbWV0aW1lcyBpdCB3cml0ZSBTX18gb3IgRl9fLCBsZXRzIGZpeCB0aGF0IHNvIGl0IGFsd2F5cyBqdXN0IHdyaXRlcyBTX18gZWN0XG4jZmlyc3Qgc2V0IHRvIG5hcyB0byB6ZXJvXG5UYXhbaXMubmEoVGF4KV08LTBcbiN0aGVuIGZpbmQgYW5kIHJlcGxhY2Ugd2l0aCBhIHNpbWlsYXIgY29tbWFuZCBhcyBhYm92ZVxuVGF4IDwtIFRheCAlPiVcbiAgbXV0YXRlKEtpbmdkb20gPSBpZmVsc2UoS2luZ2RvbSA9PSAwLCBcImtfX1wiLEtpbmdkb20pKSU+JVxuICBtdXRhdGUoUGh5bHVtID0gaWZlbHNlKFBoeWx1bSA9PSAwLCBcInBfX05BXCIsUGh5bHVtKSklPiVcbiAgbXV0YXRlKENsYXNzID0gaWZlbHNlKENsYXNzID09IDAsIFwiY19fXCIsQ2xhc3MpKSU+JVxuICBtdXRhdGUoT3JkZXIgPSBpZmVsc2UoT3JkZXIgPT0gMCwgXCJvX19cIixPcmRlcikpJT4lXG4gIG11dGF0ZShGYW1pbHkgPSBpZmVsc2UoRmFtaWx5ID09IDAsIFwiZl9fXCIsRmFtaWx5KSklPiVcbiAgbXV0YXRlKEdlbnVzID0gaWZlbHNlKEdlbnVzID09IDAsIFwiZ19fXCIsR2VudXMpKSU+JVxuICBtdXRhdGUoU3BlY2llcyA9IGlmZWxzZShTcGVjaWVzID09IDAsIFwic19fXCIsU3BlY2llcykpXG5cbmBgYCJ9 -->
-<pre class="r"><code>Tax &lt;- dplyr::rename(Tax,
- Kingdom =  tax.vector.x_1,
- Phylum = tax.vector.x_2,
- Class = tax.vector.x_3,
- Order = tax.vector.x_4,
- Family = tax.vector.x_5,
- Genus = tax.vector.x_6,
- Species = tax.vector.x_7,
-  
-  )
-
-#our datasets kinda wibbly wobbly because we&#39;ve been adding things together, so sometimes if there isnt a designated taxon it writes NA and sometimes it write S__ or F__, lets fix that so it always just writes S__ ect
-#first set to nas to zero
-Tax[is.na(Tax)]&lt;-0
-#then find and replace with a similar command as above
-Tax &lt;- Tax %&gt;%
-  mutate(Kingdom = ifelse(Kingdom == 0, &quot;k__&quot;,Kingdom))%&gt;%
-  mutate(Phylum = ifelse(Phylum == 0, &quot;p__NA&quot;,Phylum))%&gt;%
-  mutate(Class = ifelse(Class == 0, &quot;c__&quot;,Class))%&gt;%
-  mutate(Order = ifelse(Order == 0, &quot;o__&quot;,Order))%&gt;%
-  mutate(Family = ifelse(Family == 0, &quot;f__&quot;,Family))%&gt;%
-  mutate(Genus = ifelse(Genus == 0, &quot;g__&quot;,Genus))%&gt;%
-  mutate(Species = ifelse(Species == 0, &quot;s__&quot;,Species))
-</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>We have to take our tables (that exist as a dataframe) and convert
-them into a maxtrix, why? because the phyloseq class uses matrixes and
-not dataframes (in the example above we couldn’t feed our class two int
-values, it wants and int and a char!)</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI25vdyByZWFsIHN0dWZmXG4jY29udmVydCB0aGVzZSBiYWQgYm95cyB0byBtYXRyaXhlc1xuVGF4IDwtIGFzLm1hdHJpeChUYXgpXG5NZXRhRyA8LSBhcy5tYXRyaXgoTWV0YUcpXG5cblxuYGBgIn0= -->
-<pre class="r"><code>#now real stuff
-#convert these bad boys to matrixes
-Tax &lt;- as.matrix(Tax)
-MetaG &lt;- as.matrix(MetaG)
-</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>You can check the class of the objects with a simple command (oh yes
-the tables have been objects all along, we’re creating objects within
-classes within classes! neat isnt it?)</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI2NoZWNrXG5jbGFzcyhUYXgpXG5gYGAifQ== -->
-<pre class="r"><code>#check
-class(Tax)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwibWF0cml4XCIgXCJhcnJheVwiIFxuIn0= -->
-<pre><code>[1] &quot;matrix&quot; &quot;array&quot; </code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY2xhc3MoTWV0YUcpXG5gYGAifQ== -->
-<pre class="r"><code>class(MetaG)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIFwibWF0cml4XCIgXCJhcnJheVwiIFxuIn0= -->
-<pre><code>[1] &quot;matrix&quot; &quot;array&quot; </code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Phyloseq expects the far left column to be called OTU, this is how to
-do it, I’m naming the OTUs 1 and 2 because of how phyloseq merges row
-names later on</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI2NhbGwgcm93IHZhbHVlcyBPVFVcbnJvd25hbWVzKE1ldGFHKSA8LSBwYXN0ZTAoXCJPVFVcIiwgMTpucm93KE1ldGFHKSlcbnJvd25hbWVzKFRheCkgPC0gcGFzdGUwKFwiT1RVXCIsIDE6bnJvdyhUYXgpKVxuXG5cbmBgYCJ9 -->
-<pre class="r"><code>#call row values OTU
-rownames(MetaG) &lt;- paste0(&quot;OTU&quot;, 1:nrow(MetaG))
-rownames(Tax) &lt;- paste0(&quot;OTU&quot;, 1:nrow(Tax))
-</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Okay hopefully you know a bit about objects/classes, if not Funless
-fact: please go read the first couple chapters of a coding in java
-textbook Funner fact: data structure is neat, say you want to store a
-number, “1”, you can do so in java by telling it a datatype (int for
-integer), and then a value, for example int x=1; this tells the computer
-that x is equal to one. Great but int only works for numbers (and not
-even all of them ;), so what is you wanted to store a letter? well you
-use char (for character), so char y=“b”; this is saying that y is equal
-to the letter “b”. Obviously this quick example looses alot of the
-subtly and complexity of the system (re: go read the first couple
-chapters of a java textbook), but alas.</p>
-<p>So now lets say you wanted a thing, lets call it a class, that
-contained a number and a character, you could create a class that used x
-and it used y to create an object. This is a poor explanation that has
-likely made several computer scientists sad but whatever, phyloseq is a
-class that creates phyloseq objects, each object having at a minimum an
-abundance table (metaG_) and a taxonomy table (Tax_). Excellent you are
-now equally confused as earlier but I feel like I’ve done my due
-dillegence, onward.</p>
-<p>Now phyloseq wants us to turn these matrices into a different class
-created by phyloseq (not isnt a phyloseq object yet)</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG5PVFUgPSBvdHVfdGFibGUoTWV0YUcsIHRheGFfYXJlX3Jvd3MgPSBUUlVFKVxuVEFYID0gdGF4X3RhYmxlKFRheClcblxuYGBgIn0= -->
-<pre class="r"><code>
-OTU = otu_table(MetaG, taxa_are_rows = TRUE)
-TAX = tax_table(Tax)
-</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Now we’ll create a phyloseq object with each OTU table and TAXonomy
-table</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI2NvbWJpbmUgdGhhdCBkYXRhXG5waHlzZXEgPSBwaHlsb3NlcShPVFUsIFRBWClcbmBgYCJ9 -->
-<pre class="r"><code>#combine that data
-physeq = phyloseq(OTU, TAX)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Side point time! Hey do you need to add sequence information to your
-phyloseq object? follow these next couple commands First import your
-sequence information</p>
-<p>Then we will pull the sequences from the file using biostrings, then
-the taxon names from the phyloseq object, then combine this information
-and add it to the phyloseq object</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2VxdWVuY2VzIDwtIEJpb3N0cmluZ3M6OkROQVN0cmluZ1NldChhc3ZzJGBTZXFfMSRTZXFgKVxubmFtZXMoc2VxdWVuY2VzKSA8LSB0YXhhX25hbWVzKHBoeXNlcSlcbnBoeXNlcSA8LSBtZXJnZV9waHlsb3NlcShwaHlzZXEsIHNlcXVlbmNlcylcbmBgYCJ9 -->
-<pre class="r"><code>sequences &lt;- Biostrings::DNAStringSet(asvs$`Seq_1$Seq`)
-names(sequences) &lt;- taxa_names(physeq)
-physeq &lt;- merge_phyloseq(physeq, sequences)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>You can see it worked by</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucGh5c2VxXG5gYGAifQ== -->
-<pre class="r"><code>physeq</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoicGh5bG9zZXEtY2xhc3MgZXhwZXJpbWVudC1sZXZlbCBvYmplY3Rcbm90dV90YWJsZSgpICAgT1RVIFRhYmxlOiAgICAgICAgIFsgNDgwNTQgdGF4YSBhbmQgNTIgc2FtcGxlcyBdXG50YXhfdGFibGUoKSAgIFRheG9ub215IFRhYmxlOiAgICBbIDQ4MDU0IHRheGEgYnkgNyB0YXhvbm9taWMgcmFua3MgXVxucmVmc2VxKCkgICAgICBETkFTdHJpbmdTZXQ6ICAgICAgWyA0ODA1NCByZWZlcmVuY2Ugc2VxdWVuY2VzIF1cbiJ9 -->
+<!-- rnb-output-begin eyJkYXRhIjoicGh5bG9zZXEtY2xhc3MgZXhwZXJpbWVudC1sZXZlbCBvYmplY3Rcbm90dV90YWJsZSgpICAgT1RVIFRhYmxlOiAgICAgICAgIFsgNDgwNTQgdGF4YSBhbmQgNTIgc2FtcGxlcyBdXG5zYW1wbGVfZGF0YSgpIFNhbXBsZSBEYXRhOiAgICAgICBbIDUyIHNhbXBsZXMgYnkgNCBzYW1wbGUgdmFyaWFibGVzIF1cbnRheF90YWJsZSgpICAgVGF4b25vbXkgVGFibGU6ICAgIFsgNDgwNTQgdGF4YSBieSA3IHRheG9ub21pYyByYW5rcyBdXG5yZWZzZXEoKSAgICAgIEROQVN0cmluZ1NldDogICAgICBbIDQ4MDU0IHJlZmVyZW5jZSBzZXF1ZW5jZXMgXVxuIn0= -->
 <pre><code>phyloseq-class experiment-level object
 otu_table()   OTU Table:         [ 48054 taxa and 52 samples ]
+sample_data() Sample Data:       [ 52 samples by 4 sample variables ]
 tax_table()   Taxonomy Table:    [ 48054 taxa by 7 taxonomic ranks ]
 refseq()      DNAStringSet:      [ 48054 reference sequences ]</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>The Otu and tax table were added earlier this step added the refseq()
-table</p>
-<p>Excellent, almost done!</p>
-<p>Now if you inspect the sample names they have a variety of
-meanings</p>
+<p>refseq is the sequence info</p>
+<p>okay lets extract the otu table</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucGh5c2VxQG90dV90YWJsZVxuYGBgIn0= -->
-<pre class="r"><code>physeq@otu_table</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuT1RVMSA9IGFzKG90dV90YWJsZShwaHlzZXFfS2V5KSwgXCJtYXRyaXhcIilcbk9UVWRmID0gYXMuZGF0YS5mcmFtZShPVFUxKVxuYGBgIn0= -->
+<pre class="r"><code>OTU1 = as(otu_table(physeq_Key), &quot;matrix&quot;)
+OTUdf = as.data.frame(OTU1)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>Things like “municipal compost”, “fertalized” ect, this is metadata
-that are in the sample names, but the phyloseq object doesn’t know about
-yet. Fun fact: if you want to know what this actually is or what the
-names mean ask to read my manuscript but we must import this
-metadata.</p>
+<p>A taxa table</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuS2V5IDwtIHJlYWRfY3N2KFwiQzpcXFxcVXNlcnNcXFxcYW5ndXNcXFxcT25lRHJpdmUgLSBVTkJDXFxcXEFuZ3VzIEJhbGxcXFxcTGFiIHdvcmtcXFxcVUxUUkFcXFxcVGhleSBjYWxsIG1lLi4uIGRhdGFcXFxcQW5ndXMtMTZTXFxcXHVsdHJhIHRvIGNhdGVnb3JpZXMga2V5LmNzdlwiKVxuYGBgIn0= -->
-<pre class="r"><code>Key &lt;- read_csv(&quot;C:\\Users\\angus\\OneDrive - UNBC\\Angus Ball\\Lab work\\ULTRA\\They call me... data\\Angus-16S\\ultra to categories key.csv&quot;)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiUm93czogNTIgQ29sdW1uczogNeKUgOKUgCBDb2x1bW4gc3BlY2lmaWNhdGlvbiDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIDilIBcbkRlbGltaXRlcjogXCIsXCJcbmNociAoNSk6IE5hbWUsIEFtZCwgQ29uYywgRmVydGFsaXplZCwgSW5vY3VsdW1cbuKEuSBVc2UgYHNwZWMoKWAgdG8gcmV0cmlldmUgdGhlIGZ1bGwgY29sdW1uIHNwZWNpZmljYXRpb24gZm9yIHRoaXMgZGF0YS5cbuKEuSBTcGVjaWZ5IHRoZSBjb2x1bW4gdHlwZXMgb3Igc2V0IGBzaG93X2NvbF90eXBlcyA9IEZBTFNFYCB0byBxdWlldCB0aGlzIG1lc3NhZ2UuXG4ifQ== -->
-<pre><code>Rows: 52 Columns: 5── Column specification ────────────────────────────────────────────────────────────────────────────────────────────────────────────
-Delimiter: &quot;,&quot;
-chr (5): Name, Amd, Conc, Fertalized, Inoculum
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>if you explore this document, you’ll realize it has all the samples
-in order they appear on column names within the MetaG table, but they
-are in the rows instead. The meta data in other columns</p>
-<p>for the same reasons we converted to OTU earlier (phyloseq being
-fickle), we have to make the sample names be the left most row name</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuS2V5IDwtIGRhdGEuZnJhbWUoS2V5WywtMV0sIHJvdy5uYW1lcz1LZXkkTmFtZSlcbnNhbXBsZWRhdGEgPSBzYW1wbGVfZGF0YShLZXkpXG5gYGAifQ== -->
-<pre class="r"><code>Key &lt;- data.frame(Key[,-1], row.names=Key$Name)
-sampledata = sample_data(Key)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuVEFYQTEgPSBhcyh0YXhfdGFibGUocGh5c2VxX0tleSksIFwibWF0cml4XCIpXG5UQVhBZGYgPSBhcy5kYXRhLmZyYW1lKFRBWEExKVxuYGBgIn0= -->
+<pre class="r"><code>TAXA1 = as(tax_table(physeq_Key), &quot;matrix&quot;)
+TAXAdf = as.data.frame(TAXA1)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>Now we will add the key data</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucGh5c2VxX0tleSA9IG1lcmdlX3BoeWxvc2VxKHBoeXNlcSwgc2FtcGxlZGF0YSlcbmBgYCJ9 -->
-<pre class="r"><code>physeq_Key = merge_phyloseq(physeq, sampledata)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>Congrats you are done (lie)!!! You now have a phyloseq object and can
-move on to transformations and data analysis</p>
-<p>lets save it</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI3NhdmVSRFMocGh5c2VxX0tleSwgZmlsZSA9IFwiQzpcXFxcVXNlcnNcXFxcYW5ndXNcXFxcT25lRHJpdmUgLSBVTkJDXFxcXEFuZ3VzIEJhbGxcXFxcTGFiIHdvcmtcXFxcQmlvaW5mb3JtYXRpY3NcXFxcVUxUUkFcXFxccGh5c2VxX0tleV9tZXJnZWQucmRzXCIpXG5cbnBoeXNlcV9LZXkgPC0gcmVhZFJEUyhmaWxlID0gXCJDOlxcXFxVc2Vyc1xcXFxhbmd1c1xcXFxPbmVEcml2ZSAtIFVOQkNcXFxcQW5ndXMgQmFsbFxcXFxMYWIgd29ya1xcXFxCaW9pbmZvcm1hdGljc1xcXFxVTFRSQVxcXFxwaHlzZXFfS2V5X21lcmdlZC5yZHNcIilcbmBgYCJ9 -->
-<pre class="r"><code>#saveRDS(physeq_Key, file = &quot;C:\\Users\\angus\\OneDrive - UNBC\\Angus Ball\\Lab work\\Bioinformatics\\ULTRA\\physeq_Key_merged.rds&quot;)
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuI0V4cG9ydCBzZXF1ZW5jZXMgdG8gLmZuYSBmaWxlXG5TaG9ydFJlYWQ6OndyaXRlRmFzdGEocmVmc2VxKHBoeXNlcV9LZXkpLCBcIkM6XFxcXFVzZXJzXFxcXGFuZ3VzXFxcXE9uZURyaXZlIC0gVU5CQ1xcXFxBbmd1cyBCYWxsXFxcXExhYiB3b3JrXFxcXEJpb2luZm9ybWF0aWNzXFxcXFVMVFJBXFxcXHBpY3J1c3RcXFxccmVwLXNlcXMuZm5hXCIpXG5cbiNFeHBvcnQgbWV0YWRhdGEgYXMgLnR4dCBmaWxlIFxud3JpdGUudGFibGUoZGF0YS5mcmFtZShcInNhbXBsZWlkXCI9c2FtcGxlX25hbWVzKHBoeXNlcV9LZXkpLHNhbXBsZV9kYXRhKHBoeXNlcV9LZXkpKSxcIkM6XFxcXFVzZXJzXFxcXGFuZ3VzXFxcXE9uZURyaXZlIC0gVU5CQ1xcXFxBbmd1cyBCYWxsXFxcXExhYiB3b3JrXFxcXEJpb2luZm9ybWF0aWNzXFxcXFVMVFJBXFxcXHBpY3J1c3RcXFxcc2FtcGxlLW1ldGFkYXRhLnR4dFwiLCBzZXA9XCJcXHRcIiwgcm93Lm5hbWVzPUZBTFNFLCBjb2wubmFtZXM9VFJVRSwgcXVvdGU9RkFMU0UpXG5cbiNleHBvcnQgdGF4YSB0YWJsZVxud3JpdGUudGFibGUoVEFYQWRmLCBcIkM6XFxcXFVzZXJzXFxcXGFuZ3VzXFxcXE9uZURyaXZlIC0gVU5CQ1xcXFxBbmd1cyBCYWxsXFxcXExhYiB3b3JrXFxcXEJpb2luZm9ybWF0aWNzXFxcXFVMVFJBXFxcXHBpY3J1c3RcXFxcdGF4LnR4dFwiLCBxdW90ZT1GQUxTRSwgY29sLm5hbWVzPUZBTFNFLCBzZXA9XCJcXHRcIilcblxuXG4jZXhwb3J0IHRoZSBPVFUgdGFibGVcbndyaXRlLnRhYmxlKE9UVWRmLCBcIkM6XFxcXFVzZXJzXFxcXGFuZ3VzXFxcXE9uZURyaXZlIC0gVU5CQ1xcXFxBbmd1cyBCYWxsXFxcXExhYiB3b3JrXFxcXEJpb2luZm9ybWF0aWNzXFxcXFVMVFJBXFxcXHBpY3J1c3RcXFxcT1RVLnR4dFwiLCBxdW90ZT1GQUxTRSwgY29sLm5hbWVzPVRSVUUsIHNlcD1cIlxcdFwiKVxuXG5cbmBgYCJ9 -->
+<pre class="r"><code>#Export sequences to .fna file
+ShortRead::writeFasta(refseq(physeq_Key), &quot;C:\\Users\\angus\\OneDrive - UNBC\\Angus Ball\\Lab work\\Bioinformatics\\ULTRA\\picrust\\rep-seqs.fna&quot;)
 
-physeq_Key &lt;- readRDS(file = &quot;C:\\Users\\angus\\OneDrive - UNBC\\Angus Ball\\Lab work\\Bioinformatics\\ULTRA\\physeq_Key_merged.rds&quot;)</code></pre>
+#Export metadata as .txt file 
+write.table(data.frame(&quot;sampleid&quot;=sample_names(physeq_Key),sample_data(physeq_Key)),&quot;C:\\Users\\angus\\OneDrive - UNBC\\Angus Ball\\Lab work\\Bioinformatics\\ULTRA\\picrust\\sample-metadata.txt&quot;, sep=&quot;\t&quot;, row.names=FALSE, col.names=TRUE, quote=FALSE)
+
+#export taxa table
+write.table(TAXAdf, &quot;C:\\Users\\angus\\OneDrive - UNBC\\Angus Ball\\Lab work\\Bioinformatics\\ULTRA\\picrust\\tax.txt&quot;, quote=FALSE, col.names=FALSE, sep=&quot;\t&quot;)
+
+
+#export the OTU table
+write.table(OTUdf, &quot;C:\\Users\\angus\\OneDrive - UNBC\\Angus Ball\\Lab work\\Bioinformatics\\ULTRA\\picrust\\OTU.txt&quot;, quote=FALSE, col.names=TRUE, sep=&quot;\t&quot;)
+</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Go into OTU.txt and in the first line at the very beginning write OTU
+then hit tab, and save. These documents should be ready for picrust!</p>
+<!-- rnb-text-end -->
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIkltcG9ydGluZyBkYXRhIGZyb20gREFEQTIgdmlhIFBoeWxvc2VxIg0Kb3V0cHV0OiBodG1sX25vdGVib29rDQotLS0NCkJ5IEFuZ3VzIEJhbGwNCg0KSGksIGJ5IG5vdyB5b3UndmUgcHJvY2Vzc2VkIHlvdXIgZGF0YSB0aHJvdWdoIERBREEyIGFuZCBub3cgaXRzIHRpbWUgZm9yIHNvbWUgZGF0YSBhbmFseXNpcyEhISBoYWhhIHNpa2UsIHdlIGhhdmUgdG8gZm9ybWF0IGl0IGZpcnN0LCBnZXQgcmVrdA0KDQpUaGVzZSBhcmUgdGhlIHBhY2thZ2VzIHlvdSdsbCBuZWVkDQpgYGB7ciwgZWNobyA9IFQsIG1lc3NhZ2U9RkFMU0V9DQpsaWJyYXJ5KHBoeWxvc2VxKQ0KbGlicmFyeShnZ3Bsb3QyKQ0KbGlicmFyeShqYW5pdG9yKQ0KbGlicmFyeShkcGx5cikNCmxpYnJhcnkodGlkeXZlcnNlKQ0KbGlicmFyeShnZ3B1YnIpDQpsaWJyYXJ5KGFwZSkNCmxpYnJhcnkoc3BsaXRzdGFja3NoYXBlKQ0KbGlicmFyeShCaW9zdHJpbmdzKQ0KYGBgDQoNCg0KDQoNCk5vdyBpdHMgdGltZSB0byBpbXBvcnQgb3VyIGRhdGEgZnJvbSBEQVRBMiwgdW5mb3J0dW5hdGVseSB3ZSBuZWVkIHRvIHdvcmsgd2l0aCBhIC5jc3YgZmlsZSBhbmQgb3VyIGRhdGEgY29tZSBvZmYgaW4gdGV4dCBmaWxlcw0KRnVuIGZhY3Q6IC5jc3YgZmlsZXMgYXJlIGp1c3QgYmFzaWMgZXhjZWwgZmlsZXMNCg0KVG8gdHVybiB5b3VyIHRleHQgZmlsZXMgaW50byBhIC5jc3YgZmlsZSBvcGVuIGV4Y2VsIGFuZCB0aGVuIHRyeSB0byBvcGVuIHlvdXIgLnR4dCBmaWxlLiBFeGNlbCB3aWxsIGdvICJoZXkuLi4iIGFuZCB0cnkgdG8gY29udmVydCB5b3VyIHR4dCBmaWxlIGludG8gYW4gZXhjZWwgZmlsZS4gVGhpcyBpcyBwZXJmZWN0ISBPdXIgZmlsZSBpcyBkZWxpbWl0ZWQgKHRoZSBhdXRvcGlja2VkIG9wdGlvbiksIHZpYSB0YWIgKHRoZSBhdXRvcGlja2VkIG9wdGlvbiBhZnRlciB5b3UgY2xpY2sgbmV4dCBvbmNlKSwgc28gYWxsIHlvdSBoYXZlIHRvIGRvIGlzIG1lYW5kZXIgdGhyb3VnaCB0aGUgcG9wIHVwIGFuZCBleGNlbCB3aWxsIGRvIGFsbCB0aGUgaGVhdnkgbGlmdGluZyBmb3IgeW91ISBTaW1wbHkgc2F2ZSB5b3VyIGZpbGUgYXMgYSAuY3N2IGZpbGUgd2hlcmUgZXZlciB5b3UnZCBsaWtlIQ0KDQpOb3cgZ28gb2ZmIGludG8gdG8gd29ybGQgYW5kIGNyZWF0ZSBhIGNzdiBmaWxlIG9mIHlvdSAxNlNfUltuYW1lXV9kYWRhMl9ub2NoaW1fdGF4LnR4dCBmaWxlIQ0KT2theSBzd2VldCwgb24gdGhlIGxlZnQgc2hvdWxkIGJlIGEgcm93IG9mIFNWXzAuLlN2XzEwIGVjdCwgaW4gdGhlIG1pZGRsZSBpcyB5b3Ugc2FtcGxlIG5hbWUgd2l0aCBhbGwgdGhlIGNvdW50IGRhdGEgcGVyIHNwZWNpZXMgYW5kIG9uIHRoZSByaWdodCBpcyB0YXgudmVjdG9yLg0KDQoNCg0KRnVuIGZhY3Q6IGJhY2t1cHMhIGhleSBpJ3ZlIG5vdGljZWQgdGhhdCB5b3UgZGlkbid0IGltbWVkaWF0ZWx5IGNyZWF0ZSBhIGJhY2t1cCBhbmQgYSB3b3JraW5nIGNzdiBmaWxlLCBTaGFtZSBvbiB5b3UhIEl0cyBpbXBvcnRhbnQgdG8gYWx3YXlzIGNyZWF0ZSBiYWNrdXAgZmlsZXMgeW91IE5FVkVSIG1vZGlmeSBpbiBleGNlbCB3aGVuIHlvdSBnZXQgYSBuZXcgZmlsZSB5b3UgcGxhbiBvbiBtb2RpZnlpbmcuIEl0J2QgYmUgYSBzaGFtZSBpcyB5b3Ugd2VyZSB0byBkZWxldGUgc29tZXRoaW5nIHlvdSBzaG91bGRuJ3QgaGF2ZSBhbmQgdGhlbiByZXN0YXJ0IGZyb20gdGhlIGJlZ2lubmluZy4gDQoNCllvdSdyZSAxNlNfUltuYW1lXV9kYWRhMl9ub2NoaW1fdGF4LmNzdiBmaWxlIGlzIG5vdyByZWFkeSB0byBiZSBpbXBvcnRlZCBpbnRvIFINCg0KTGV0cyBpbXBvcnQgdGhpcyB0YWJsZQ0KDQpgYGB7ciwgZWNobyA9IFQsIG1lc3NhZ2U9RkFMU0V9DQpNZXRhR18xIDwtIHJlYWRfY3N2KCJDOlxcVXNlcnNcXGFuZ3VzXFxPbmVEcml2ZSAtIFVOQkNcXEFuZ3VzIEJhbGxcXExhYiB3b3JrXFxVTFRSQVxcVGhleSBjYWxsIG1lLi4uIGRhdGFcXEFuZ3VzLTE2U1xcMTZTLWRhZGEyX25vY2hpbV90YXguY3N2IikNCk1ldGFHXzIgPC0gcmVhZF9jc3YoIkM6XFxVc2Vyc1xcYW5ndXNcXE9uZURyaXZlIC0gVU5CQ1xcQW5ndXMgQmFsbFxcTGFiIHdvcmtcXFVMVFJBXFxUaGV5IGNhbGwgbWUuLi4gZGF0YVxcQW5ndXMtMTZTXFxSZWRvbmUgbWFzdGVybWl4IHN0dWZmXFwxNlNfUmVmSW5vY3VsdW1fZGFkYTJfbm9jaGltX3RheC5jc3YiKQ0KU2VxXzEgPC0gcmVhZF9jc3YoIkM6XFxVc2Vyc1xcYW5ndXNcXE9uZURyaXZlIC0gVU5CQ1xcQW5ndXMgQmFsbFxcTGFiIHdvcmtcXFVMVFJBXFxUaGV5IGNhbGwgbWUuLi4gZGF0YVxcQW5ndXMtMTZTXFwxNlMtc3Zfc2Vxcy5jc3YiKQ0KU2VxXzIgPC0gcmVhZF9jc3YoIkM6XFxVc2Vyc1xcYW5ndXNcXE9uZURyaXZlIC0gVU5CQ1xcQW5ndXMgQmFsbFxcTGFiIHdvcmtcXFVMVFJBXFxUaGV5IGNhbGwgbWUuLi4gZGF0YVxcQW5ndXMtMTZTXFxSZWRvbmUgbWFzdGVybWl4IHN0dWZmXFwxNlNfUmVmSW5vY3VsdW1fc3Zfc2Vxcy5jc3YiKQ0KDQpgYGANCg0KQ29uZ3JhdHMhIFdlIG5vdyBoYXZlIHRoZSBkYXRhIGluIFIsIHlvdSBtYXkgaGF2ZSBub3RpY2VkIEkndmUgYWN0dWFsbHkgcmVhZCAyIHNlcGFyYXRlIHNldHMgb2YgZGF0YSwgMSBhbmQgMi4gWW91IG1pZ2h0IG5vdCBoYXZlIHR3byBzZXRzIG9mIGRhdGEgYnV0IEkgZG8hLiBXZSB3aWxsIHRoZW4gY3JlYXRlIHBoeWxvc2VxIG9iamVjdHMgd2l0aCBib3RoIHRoZXNlIGRhdGFzZXRzDQoNClRoaXMgaXMgd2hhdCB0aGUgZGF0YSBsb29rcyBsaWtlICh0aGUgc2Vjb25kIGNvcHkgaXMgdGhlIHNhbWUpDQpgYGB7cn0NCmhlYWQoTWV0YUdfMSkNCmBgYA0KYGBge3J9DQpoZWFkKFNlcV8xKQ0KYGBgDQoNCg0KDQoNCldlJ2xsIHN0YXJ0IGJ5IGNvbmNhdGVuYXRpbmcgYWxsIHRoZXNlIHRhYmxlcyEgVGhlIE1ldGFHIHRhYmxlcyBhcmUgT1RVIHRhYmxlcywgd2l0aCBjb3VudCBhbmQgc3BlY2llcyBkYXRhLCB0aGUgU2VxIHRhYmxlcyBhcmUgdGhlIGV4YWN0IEFTVnMgZm9yIGVhY2ggc2VxdWVuY2UuIFNpbmNlIHdlIHdhbnQgdG8gY29tYmluZSB0aGVzZSB0YWJsZXMgd2UgbXVzdCBtYWtlIHN1cmUgdGhhdCB0aGUgQVNWJ3MgZXhhY3RseSBtYXRjaCBlYWNoIG90aGVyDQoNClNvLCANCg0KYGBge3J9DQpNZXRhR18xX3RvdGFsIDwtIGNiaW5kKE1ldGFHXzEsIFNlcV8xJFNlcSkNCk1ldGFHXzJfdG90YWwgPC0gY2JpbmQoTWV0YUdfMiwgU2VxXzIkU2VxKQ0KDQpgYGANCg0KVGhlbiB3ZSBoYXZlIHRvIHJlbW92ZSB0aGUgU1ZzIHNvIHRoZXJlIGlzbnQgbXVsdGlwbGUgb2YgdGhlIHNhbWUgdmFsdWUgaW4gdGhlIGZpbmFsIHRhYmxlDQoNCmBgYHtyfQ0KI3JlbW92ZSB0aGUgc1YgdmFsdWUNCk1ldGFHXzFfdG90YWwgPC0gc2VsZWN0KE1ldGFHXzFfdG90YWwsIC0oMSkpDQpNZXRhR18yX3RvdGFsIDwtIHNlbGVjdChNZXRhR18yX3RvdGFsLCAtKDEpKQ0KDQpgYGANCg0KVGhlbiB3ZSBjYW4gY29tYmluZSB0aGVzZSB0d28gdGFibGVzIGJhc2VkIG9uIHRoZSBBU1YgZGF0YSBpcyBTZXEsIEJVVCB0byBtYWtlIHN1cmUgd2UgZG9udCBsb29zZSBhbnl0aGluZyBsZXRzIGZpbmQgb3V0IHRoZSBhbW91bnQgb2YgY291bnRzIHBlciByb3cuIEltIGp1c3QgZ29pbmcgdG8gc3BvdCBjaGVjayB0d28NCg0KYGBge3J9DQpzdW0oTWV0YUdfMV90b3RhbCRgTXVuaWNpcGFsIGNvbXBvc3QtMTAtRmVydGFsaXplZC1Jbm9jdWxhdGVkYCkNCnN1bShNZXRhR18yX3RvdGFsJE1hc3Rlck1peCkNCmBgYA0Kb2theSB0aW1lIHRvIGNvbWJpbmUgdGhlbQ0KYGBge3J9DQpNZXRhRyA8LSBtZXJnZShNZXRhR18xX3RvdGFsLCBNZXRhR18yX3RvdGFsLCBieS54ID0gIlNlcV8xJFNlcSIsIGJ5LnkgPSAiU2VxXzIkU2VxIiwgYWxsLnggPSBUUlVFLCBhbGwueSA9IFRSVUUpDQpgYGANCg0KTGV0cyBjaGVjayB0aG9zZSBzdW1zIGFnYWluIQ0KDQpgYGB7cn0NCnN1bShNZXRhRyRgTXVuaWNpcGFsIGNvbXBvc3QtMTAtRmVydGFsaXplZC1Jbm9jdWxhdGVkYCkNCnN1bShNZXRhRyRNYXN0ZXJNaXgpDQpgYGANClRoYXRzIGJlY2F1c2UgaW4gdGhlIG1lcmdlIHN0ZXAgYSBidW5jaCBvZiBOQSdzIHdlcmUgYWRkZWQgb24gcm93cyBub3Qgc2VlbiBpbiBib3RoIHNhbXBsZXMsIHdlIGNhbiBqdXN0IHNldCB0aG9zZSBOQSdzIHRvIDANCg0KYGBge3J9DQpNZXRhR1tpcy5uYShNZXRhRyldPC0wDQpgYGANCmBgYHtyfQ0Kc3VtKE1ldGFHJGBNdW5pY2lwYWwgY29tcG9zdC0xMC1GZXJ0YWxpemVkLUlub2N1bGF0ZWRgKQ0Kc3VtKE1ldGFHJE1hc3Rlck1peCkNCmBgYA0KUGVyZmVjdCBzYW1lIGFzIGJlZm9yZSBzbyB0aGVyZSB3YXMgbm8gZGF0YSBsb3NzIQ0KDQpMZXRzIGp1c3QgY2xlYW4gdXAgdGhlIHRhYmxlIGEgYml0DQpgYGB7cn0NCiNmaXJzdCBzZXBlcmF0ZSB0aGUgQVNWJ3MgaW50byBhIG5ldyB0YWJsZQ0KYXN2cyA8LSBzZWxlY3QoTWV0YUcsICJTZXFfMSRTZXEiKQ0KTWV0YUcgPC0gc2VsZWN0KE1ldGFHLCAtIlNlcV8xJFNlcSIpICN0aGVuIHJlbW92ZSB0aGVtIGZyb20gdGhlIHRhYmxlDQojbGV0cyBzZXBlcmF0ZSB0aGUgdGF4YSB2YWx1ZXMNClRheF90ZW1wPC1zZWxlY3QoTWV0YUcsIGMoInRheC52ZWN0b3IueCIsICJ0YXgudmVjdG9yLnkiKSkNCiN0aGVuIGxldHMgcHV0IHRoZW0gaW4gdGhlIHNhbWUgY29sdW1uLCBzbyB0aGF0IHRheC52ZWN0b3IueCBjb250YWlucyBubyB6ZXJvcyBhbmQgaG9sZHMgYWxsIHRoZSBkYXRhDQpUYXhfZml4ZWQgPC0gVGF4X3RlbXAgJT4lDQogIG11dGF0ZSh0YXgudmVjdG9yLnggPSBpZmVsc2UodGF4LnZlY3Rvci54ID09IDAsIHRheC52ZWN0b3IueSx0YXgudmVjdG9yLngpKSNzcG9rZW4sIGlmIHRheC54IGNvbnRhaW5zIGEgemVybyByZXBsYWNlIHdpdGggdmFsdWUgZnJvbSB0YXgueSAod2hpY2ggd2Uga25vdyBoYXMgdG8gaGF2ZSBhIHZhbHVlIGlmIHRheC54IGRvZXNuJ3QpDQojcmVuYW1lDQpUYXhfZml4ZWQgPC0gc2VsZWN0KFRheF9maXhlZCwgLSJ0YXgudmVjdG9yLnkiKQ0KYGBgDQoNCg0KYGBge3J9DQojVGhlbiB3ZSBjYW4gZnVsbHkgY2xlYW4gdXAgdGhlIG1ldGFHIHRhYmxlDQpNZXRhRyA8LSBNZXRhRyAlPiUNCiAgc2VsZWN0KC0idGF4LnZlY3Rvci54IikgJT4lDQogICAgICAgICAgIHNlbGVjdCgtInRheC52ZWN0b3IueSIpICU+JQ0KICAgICAgICBzZWxlY3QoLSgiQ0hCMVAxIjoiRk5QOUIzIikpICNyZW1vdmluZyB0aGUgdGF4J3MgYmMgdGhleSBhcmUgaW4gdGF4X2ZpeGVkIG5vdywgYW5kIHJlbW92aW5nIHNhbXBsZXMgbm90IGFwcGxpY2FibGUgdG8gdGhpcyBkYXRhc2V0DQoNCmBgYA0KDQoNCg0KDQoNCg0KRmlyc3QgdGhpbmdzIGZpcnN0LCB3ZSBoYXZlIHRvIGZvcm1hdCB0aGUgdGFibGVzIGluIGEgd2F5IHRoYXQgcGh5bG9zZXEgaXMgZXhwZWN0aW5nIHRoZW0gYW5kIHVuZm9ydHVuYXRlbHksIHRoaXMgaXMgYSBiaXQgb2YgYSBwYWluLiBQaHlsb3NlcSBleHBlY3RzIGEgY291cGxlIHRhYmxlcy4gRmlyc3QgYSBjb3VudCB0YWJsZSAodGhpcyBpcyB0aGUgTWV0YUcgdGFibGUpLCBBIHRheG9ub215IHRhYmxlIChUaGlzIGlzIHRheC52ZWN0b3IpLCBhbmQgYSBzYW1wbGUgZGF0YSB0YWJsZSAoVGhpcyBvbmVzIGJhc2VkIG9mZiBvZiB0aGUgZ3JvdXAgb2YgZGF0YSB0aGF0IGV4aXN0IGluIHlvdXIgc2FtcGxlKQ0KDQpMZXRzIGZpcnN0IHN0YXJ0IGJ5IGNyZWF0aW5nIHRoZSB0YXhvbm9teSB0YWJsZSBmcm9tIHRoZSBNZXRhRyB0YWJsZXMhDQoNCmBgYHtyfQ0KVGF4PC1zZWxlY3QoVGF4X2ZpeGVkLCAoInRheC52ZWN0b3IueCIpKSANCmBgYA0KT2ggYm90aGVyISBQaHlsb3NlcSBleHBlY3RzIHRoZSB0YXhvbm9teSB0byBiZSBzZXBhcmF0ZWQgYnkgdGF4b25zIGkuZS4gb25lIGNvbHVtbiBmb3Iga2luZ2RvbSwgb25lIGZvciBmYW1pbHkgZWN0LiBCdXQgZXZlcnl0aGluZyBpcyB1bmRlciBvbmUgY29sdW1uLiBUaGlzIG1lYW5zIHdlIGhhdmUgdG8gZGVsaW1pbmF0ZSBhZ2FpbiwgYW5kIGxvb2tpbmcgYXQgdGhlIGhvdyB0byBjb2x1bW4gaXMgY3JlYXRlZCBmcm9tIERBREEyLCB3ZSBuZWVkIHRvIGRlbGltaW5hdGUgYnkgY29sb24NCg0KY1NwbGl0IGRlbGltaW5hdGVzIHdpdGhpbiBhIGNvbHVtbiBhbmQgdGhlbiB0aGUgcmVuYW1lIGZ1bmN0aW9ucyBtYWtlIGFsbCB0aGUgY29sdW1ucyBuYW1lcyBwaHlsb3NlcSBleHBlY3RzIQ0KDQpgYGB7cn0NClRheCA8LSBjU3BsaXQoVGF4LCAidGF4LnZlY3Rvci54IiwgIjoiKQ0KVGF4IDwtIGRwbHlyOjpyZW5hbWUoVGF4LA0KIEtpbmdkb20gPSAgdGF4LnZlY3Rvci54XzEsDQogUGh5bHVtID0gdGF4LnZlY3Rvci54XzIsDQogQ2xhc3MgPSB0YXgudmVjdG9yLnhfMywNCiBPcmRlciA9IHRheC52ZWN0b3IueF80LA0KIEZhbWlseSA9IHRheC52ZWN0b3IueF81LA0KIEdlbnVzID0gdGF4LnZlY3Rvci54XzYsDQogU3BlY2llcyA9IHRheC52ZWN0b3IueF83LA0KICANCiAgKQ0KDQojb3VyIGRhdGFzZXRzIGtpbmRhIHdpYmJseSB3b2JibHkgYmVjYXVzZSB3ZSd2ZSBiZWVuIGFkZGluZyB0aGluZ3MgdG9nZXRoZXIsIHNvIHNvbWV0aW1lcyBpZiB0aGVyZSBpc250IGEgZGVzaWduYXRlZCB0YXhvbiBpdCB3cml0ZXMgTkEgYW5kIHNvbWV0aW1lcyBpdCB3cml0ZSBTX18gb3IgRl9fLCBsZXRzIGZpeCB0aGF0IHNvIGl0IGFsd2F5cyBqdXN0IHdyaXRlcyBTX18gZWN0DQojZmlyc3Qgc2V0IHRvIG5hcyB0byB6ZXJvDQpUYXhbaXMubmEoVGF4KV08LTANCiN0aGVuIGZpbmQgYW5kIHJlcGxhY2Ugd2l0aCBhIHNpbWlsYXIgY29tbWFuZCBhcyBhYm92ZQ0KVGF4IDwtIFRheCAlPiUNCiAgbXV0YXRlKEtpbmdkb20gPSBpZmVsc2UoS2luZ2RvbSA9PSAwLCAia19fIixLaW5nZG9tKSklPiUNCiAgbXV0YXRlKFBoeWx1bSA9IGlmZWxzZShQaHlsdW0gPT0gMCwgInBfX05BIixQaHlsdW0pKSU+JQ0KICBtdXRhdGUoQ2xhc3MgPSBpZmVsc2UoQ2xhc3MgPT0gMCwgImNfXyIsQ2xhc3MpKSU+JQ0KICBtdXRhdGUoT3JkZXIgPSBpZmVsc2UoT3JkZXIgPT0gMCwgIm9fXyIsT3JkZXIpKSU+JQ0KICBtdXRhdGUoRmFtaWx5ID0gaWZlbHNlKEZhbWlseSA9PSAwLCAiZl9fIixGYW1pbHkpKSU+JQ0KICBtdXRhdGUoR2VudXMgPSBpZmVsc2UoR2VudXMgPT0gMCwgImdfXyIsR2VudXMpKSU+JQ0KICBtdXRhdGUoU3BlY2llcyA9IGlmZWxzZShTcGVjaWVzID09IDAsICJzX18iLFNwZWNpZXMpKQ0KDQpgYGANCg0KDQoNCldlIGhhdmUgdG8gdGFrZSBvdXIgdGFibGVzICh0aGF0IGV4aXN0IGFzIGEgZGF0YWZyYW1lKSBhbmQgY29udmVydCB0aGVtIGludG8gYSBtYXh0cml4LCB3aHk/IGJlY2F1c2UgdGhlIHBoeWxvc2VxIGNsYXNzIHVzZXMgbWF0cml4ZXMgYW5kIG5vdCBkYXRhZnJhbWVzIChpbiB0aGUgZXhhbXBsZSBhYm92ZSB3ZSBjb3VsZG4ndCBmZWVkIG91ciBjbGFzcyB0d28gaW50IHZhbHVlcywgaXQgd2FudHMgYW5kIGludCBhbmQgYSBjaGFyISkNCg0KYGBge3J9DQojbm93IHJlYWwgc3R1ZmYNCiNjb252ZXJ0IHRoZXNlIGJhZCBib3lzIHRvIG1hdHJpeGVzDQpUYXggPC0gYXMubWF0cml4KFRheCkNCk1ldGFHIDwtIGFzLm1hdHJpeChNZXRhRykNCg0KDQpgYGANCg0KWW91IGNhbiBjaGVjayB0aGUgY2xhc3Mgb2YgdGhlIG9iamVjdHMgd2l0aCBhIHNpbXBsZSBjb21tYW5kIChvaCB5ZXMgdGhlIHRhYmxlcyBoYXZlIGJlZW4gb2JqZWN0cyBhbGwgYWxvbmcsIHdlJ3JlIGNyZWF0aW5nIG9iamVjdHMgd2l0aGluIGNsYXNzZXMgd2l0aGluIGNsYXNzZXMhIG5lYXQgaXNudCBpdD8pDQoNCmBgYHtyfQ0KI2NoZWNrDQpjbGFzcyhUYXgpDQpjbGFzcyhNZXRhRykNCg0KYGBgDQoNCg0KUGh5bG9zZXEgZXhwZWN0cyB0aGUgZmFyIGxlZnQgY29sdW1uIHRvIGJlIGNhbGxlZCBPVFUsIHRoaXMgaXMgaG93IHRvIGRvIGl0LCBJJ20gbmFtaW5nIHRoZSBPVFVzIDEgYW5kIDIgYmVjYXVzZSBvZiBob3cgcGh5bG9zZXEgbWVyZ2VzIHJvdyBuYW1lcyBsYXRlciBvbg0KYGBge3J9DQojY2FsbCByb3cgdmFsdWVzIE9UVQ0Kcm93bmFtZXMoTWV0YUcpIDwtIHBhc3RlMCgiT1RVIiwgMTpucm93KE1ldGFHKSkNCnJvd25hbWVzKFRheCkgPC0gcGFzdGUwKCJPVFUiLCAxOm5yb3coVGF4KSkNCg0KDQpgYGANCg0KDQpPa2F5IGhvcGVmdWxseSB5b3Uga25vdyBhIGJpdCBhYm91dCBvYmplY3RzL2NsYXNzZXMsIGlmIG5vdA0KRnVubGVzcyBmYWN0OiBwbGVhc2UgZ28gcmVhZCB0aGUgZmlyc3QgY291cGxlIGNoYXB0ZXJzIG9mIGEgY29kaW5nIGluIGphdmEgdGV4dGJvb2sNCkZ1bm5lciBmYWN0OiBkYXRhIHN0cnVjdHVyZSBpcyBuZWF0LCBzYXkgeW91IHdhbnQgdG8gc3RvcmUgYSBudW1iZXIsICIxIiwgeW91IGNhbiBkbyBzbyBpbiBqYXZhIGJ5IHRlbGxpbmcgaXQgYSBkYXRhdHlwZSAoaW50IGZvciBpbnRlZ2VyKSwgYW5kIHRoZW4gYSB2YWx1ZSwgZm9yIGV4YW1wbGUgaW50IHg9MTsgdGhpcyB0ZWxscyB0aGUgY29tcHV0ZXIgdGhhdCB4IGlzIGVxdWFsIHRvIG9uZS4gR3JlYXQgYnV0IGludCBvbmx5IHdvcmtzIGZvciBudW1iZXJzIChhbmQgbm90IGV2ZW4gYWxsIG9mIHRoZW0gOyksIHNvIHdoYXQgaXMgeW91IHdhbnRlZCB0byBzdG9yZSBhIGxldHRlcj8gd2VsbCB5b3UgdXNlIGNoYXIgKGZvciBjaGFyYWN0ZXIpLCBzbyBjaGFyIHk9ImIiOyB0aGlzIGlzIHNheWluZyB0aGF0IHkgaXMgZXF1YWwgdG8gdGhlIGxldHRlciAiYiIuIE9idmlvdXNseSB0aGlzIHF1aWNrIGV4YW1wbGUgbG9vc2VzIGFsb3Qgb2YgdGhlIHN1YnRseSBhbmQgY29tcGxleGl0eSBvZiB0aGUgc3lzdGVtIChyZTogZ28gcmVhZCB0aGUgZmlyc3QgY291cGxlIGNoYXB0ZXJzIG9mIGEgamF2YSB0ZXh0Ym9vayksIGJ1dCBhbGFzLg0KDQpTbyBub3cgbGV0cyBzYXkgeW91IHdhbnRlZCBhIHRoaW5nLCBsZXRzIGNhbGwgaXQgYSBjbGFzcywgdGhhdCBjb250YWluZWQgYSBudW1iZXIgYW5kIGEgY2hhcmFjdGVyLCB5b3UgY291bGQgY3JlYXRlIGEgY2xhc3MgdGhhdCB1c2VkIHggYW5kIGl0IHVzZWQgeSB0byBjcmVhdGUgYW4gb2JqZWN0LiBUaGlzIGlzIGEgcG9vciBleHBsYW5hdGlvbiB0aGF0IGhhcyBsaWtlbHkgbWFkZSBzZXZlcmFsIGNvbXB1dGVyIHNjaWVudGlzdHMgc2FkIGJ1dCB3aGF0ZXZlciwgcGh5bG9zZXEgaXMgYSBjbGFzcyB0aGF0IGNyZWF0ZXMgcGh5bG9zZXEgb2JqZWN0cywgZWFjaCBvYmplY3QgaGF2aW5nIGF0IGEgbWluaW11bSBhbiBhYnVuZGFuY2UgdGFibGUgKG1ldGFHXykgYW5kIGEgdGF4b25vbXkgdGFibGUgKFRheF8pLiBFeGNlbGxlbnQgeW91IGFyZSBub3cgZXF1YWxseSBjb25mdXNlZCBhcyBlYXJsaWVyIGJ1dCBJIGZlZWwgbGlrZSBJJ3ZlIGRvbmUgbXkgZHVlIGRpbGxlZ2VuY2UsIG9ud2FyZC4NCg0KDQpOb3cgcGh5bG9zZXEgd2FudHMgdXMgdG8gdHVybiB0aGVzZSBtYXRyaWNlcyBpbnRvIGEgZGlmZmVyZW50IGNsYXNzIGNyZWF0ZWQgYnkgcGh5bG9zZXEgKG5vdCBpc250IGEgcGh5bG9zZXEgb2JqZWN0IHlldCkNCg0KYGBge3J9DQoNCk9UVSA9IG90dV90YWJsZShNZXRhRywgdGF4YV9hcmVfcm93cyA9IFRSVUUpDQpUQVggPSB0YXhfdGFibGUoVGF4KQ0KDQpgYGANCg0KTm93IHdlJ2xsIGNyZWF0ZSBhIHBoeWxvc2VxIG9iamVjdCB3aXRoIGVhY2ggT1RVIHRhYmxlIGFuZCBUQVhvbm9teSB0YWJsZQ0KDQpgYGB7cn0NCiNjb21iaW5lIHRoYXQgZGF0YQ0KcGh5c2VxID0gcGh5bG9zZXEoT1RVLCBUQVgpDQpgYGANCg0KU2lkZSBwb2ludCB0aW1lISBIZXkgZG8geW91IG5lZWQgdG8gYWRkIHNlcXVlbmNlIGluZm9ybWF0aW9uIHRvIHlvdXIgcGh5bG9zZXEgb2JqZWN0PyBmb2xsb3cgdGhlc2UgbmV4dCBjb3VwbGUgY29tbWFuZHMNCkZpcnN0IGltcG9ydCB5b3VyIHNlcXVlbmNlIGluZm9ybWF0aW9uDQoNCg0KVGhlbiB3ZSB3aWxsIHB1bGwgdGhlIHNlcXVlbmNlcyBmcm9tIHRoZSBmaWxlIHVzaW5nIGJpb3N0cmluZ3MsIHRoZW4gdGhlIHRheG9uIG5hbWVzIGZyb20gdGhlIHBoeWxvc2VxIG9iamVjdCwgdGhlbiBjb21iaW5lIHRoaXMgaW5mb3JtYXRpb24gYW5kIGFkZCBpdCB0byB0aGUgcGh5bG9zZXEgb2JqZWN0DQpgYGB7cn0NCnNlcXVlbmNlcyA8LSBCaW9zdHJpbmdzOjpETkFTdHJpbmdTZXQoYXN2cyRgU2VxXzEkU2VxYCkNCm5hbWVzKHNlcXVlbmNlcykgPC0gdGF4YV9uYW1lcyhwaHlzZXEpDQpwaHlzZXEgPC0gbWVyZ2VfcGh5bG9zZXEocGh5c2VxLCBzZXF1ZW5jZXMpDQpgYGANCg0KWW91IGNhbiBzZWUgaXQgd29ya2VkIGJ5DQpgYGB7cn0NCnBoeXNlcQ0KYGBgDQpUaGUgT3R1IGFuZCB0YXggdGFibGUgd2VyZSBhZGRlZCBlYXJsaWVyIHRoaXMgc3RlcCBhZGRlZCB0aGUgcmVmc2VxKCkgdGFibGUNCg0KRXhjZWxsZW50LCBhbG1vc3QgZG9uZSENCg0KTm93IGlmIHlvdSBpbnNwZWN0IHRoZSBzYW1wbGUgbmFtZXMgdGhleSBoYXZlIGEgdmFyaWV0eSBvZiBtZWFuaW5ncw0KYGBge3J9DQpwaHlzZXFAb3R1X3RhYmxlDQpgYGANClRoaW5ncyBsaWtlICJtdW5pY2lwYWwgY29tcG9zdCIsICJmZXJ0YWxpemVkIiBlY3QsIHRoaXMgaXMgbWV0YWRhdGEgdGhhdCBhcmUgaW4gdGhlIHNhbXBsZSBuYW1lcywgYnV0IHRoZSBwaHlsb3NlcSBvYmplY3QgZG9lc24ndCBrbm93IGFib3V0IHlldC4gDQpGdW4gZmFjdDogaWYgeW91IHdhbnQgdG8ga25vdyB3aGF0IHRoaXMgYWN0dWFsbHkgaXMgb3Igd2hhdCB0aGUgbmFtZXMgbWVhbiBhc2sgdG8gcmVhZCBteSBtYW51c2NyaXB0DQpidXQgd2UgbXVzdCBpbXBvcnQgdGhpcyBtZXRhZGF0YS4gDQoNCmBgYHtyfQ0KS2V5IDwtIHJlYWRfY3N2KCJDOlxcVXNlcnNcXGFuZ3VzXFxPbmVEcml2ZSAtIFVOQkNcXEFuZ3VzIEJhbGxcXExhYiB3b3JrXFxVTFRSQVxcVGhleSBjYWxsIG1lLi4uIGRhdGFcXEFuZ3VzLTE2U1xcdWx0cmEgdG8gY2F0ZWdvcmllcyBrZXkuY3N2IikNCmBgYA0KDQppZiB5b3UgZXhwbG9yZSB0aGlzIGRvY3VtZW50LCB5b3UnbGwgcmVhbGl6ZSBpdCBoYXMgYWxsIHRoZSBzYW1wbGVzIGluIG9yZGVyIHRoZXkgYXBwZWFyIG9uIGNvbHVtbiBuYW1lcyB3aXRoaW4gdGhlIE1ldGFHIHRhYmxlLCBidXQgdGhleSBhcmUgaW4gdGhlIHJvd3MgaW5zdGVhZC4gVGhlIG1ldGEgZGF0YSBpbiBvdGhlciBjb2x1bW5zDQoNCg0KZm9yIHRoZSBzYW1lIHJlYXNvbnMgd2UgY29udmVydGVkIHRvIE9UVSBlYXJsaWVyIChwaHlsb3NlcSBiZWluZyBmaWNrbGUpLCB3ZSBoYXZlIHRvIG1ha2UgdGhlIHNhbXBsZSBuYW1lcyBiZSB0aGUgbGVmdCBtb3N0IHJvdyBuYW1lDQpgYGB7cn0NCktleSA8LSBkYXRhLmZyYW1lKEtleVssLTFdLCByb3cubmFtZXM9S2V5JE5hbWUpDQpzYW1wbGVkYXRhID0gc2FtcGxlX2RhdGEoS2V5KQ0KYGBgDQoNCg0KDQpOb3cgd2Ugd2lsbCBhZGQgdGhlIGtleSBkYXRhIA0KYGBge3J9DQpwaHlzZXFfS2V5ID0gbWVyZ2VfcGh5bG9zZXEocGh5c2VxLCBzYW1wbGVkYXRhKQ0KYGBgDQoNCg0KQ29uZ3JhdHMgeW91IGFyZSBkb25lIChsaWUpISEhIFlvdSBub3cgaGF2ZSBhIHBoeWxvc2VxIG9iamVjdCBhbmQgY2FuIG1vdmUgb24gdG8gdHJhbnNmb3JtYXRpb25zIGFuZCBkYXRhIGFuYWx5c2lzDQoNCg0KDQpsZXRzIHNhdmUgaXQNCg0KYGBge3J9DQojc2F2ZVJEUyhwaHlzZXFfS2V5LCBmaWxlID0gIkM6XFxVc2Vyc1xcYW5ndXNcXE9uZURyaXZlIC0gVU5CQ1xcQW5ndXMgQmFsbFxcTGFiIHdvcmtcXEJpb2luZm9ybWF0aWNzXFxVTFRSQVxccGh5c2VxX0tleV9tZXJnZWQucmRzIikNCg0KcGh5c2VxX0tleSA8LSByZWFkUkRTKGZpbGUgPSAiQzpcXFVzZXJzXFxhbmd1c1xcT25lRHJpdmUgLSBVTkJDXFxBbmd1cyBCYWxsXFxMYWIgd29ya1xcQmlvaW5mb3JtYXRpY3NcXFVMVFJBXFxwaHlzZXFfS2V5X21lcmdlZC5yZHMiKQ0KYGBgDQo=</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIkNyZWF0aW5nIGEgdHN2IGZpbGUgZnJvbSB5b3VyIHBoeWxvc2VxIG9iamVjdCINCm91dHB1dDogaHRtbF9ub3RlYm9vaw0KLS0tDQpCeSBBbmd1cyBiYWxsDQoNCg0KDQpgYGB7cn0NCmxpYnJhcnkocGh5bG9zZXEpDQpsaWJyYXJ5KHRpZHlyKQ0KYGBgDQoNCkJyaW5nIGluIHlvdXIgZnVsbCBwaHlsb3NlcSBvYmplY3QgV0lUSCBzZXF1ZW5jZSBpbmZvcm1hdGlvbg0KDQpgYGB7cn0NCnBoeXNlcV9LZXkgPC0gcmVhZFJEUyhmaWxlID0gIkM6XFxVc2Vyc1xcYW5ndXNcXE9uZURyaXZlIC0gVU5CQ1xcQW5ndXMgQmFsbFxcTGFiIHdvcmtcXEJpb2luZm9ybWF0aWNzXFxVTFRSQVxccGh5c2VxX0tleV9tZXJnZWQucmRzIikNCiNJIGNhbiB0ZWxsIGl0IGhhcyBzZXF1ZW5jZSBpbmZvcm1hdGlvbiBieSB0aGlzDQpwaHlzZXFfS2V5DQoNCmBgYA0KcmVmc2VxIGlzIHRoZSBzZXF1ZW5jZSBpbmZvDQoNCm9rYXkgbGV0cyBleHRyYWN0IHRoZSBvdHUgdGFibGUgDQpgYGB7cn0NCk9UVTEgPSBhcyhvdHVfdGFibGUocGh5c2VxX0tleSksICJtYXRyaXgiKQ0KT1RVZGYgPSBhcy5kYXRhLmZyYW1lKE9UVTEpDQpgYGANCg0KQSB0YXhhIHRhYmxlDQpgYGB7cn0NClRBWEExID0gYXModGF4X3RhYmxlKHBoeXNlcV9LZXkpLCAibWF0cml4IikNClRBWEFkZiA9IGFzLmRhdGEuZnJhbWUoVEFYQTEpDQpgYGANCg0KDQoNCmBgYHtyfQ0KI0V4cG9ydCBzZXF1ZW5jZXMgdG8gLmZuYSBmaWxlDQpTaG9ydFJlYWQ6OndyaXRlRmFzdGEocmVmc2VxKHBoeXNlcV9LZXkpLCAiQzpcXFVzZXJzXFxhbmd1c1xcT25lRHJpdmUgLSBVTkJDXFxBbmd1cyBCYWxsXFxMYWIgd29ya1xcQmlvaW5mb3JtYXRpY3NcXFVMVFJBXFxwaWNydXN0XFxyZXAtc2Vxcy5mbmEiKQ0KDQojRXhwb3J0IG1ldGFkYXRhIGFzIC50eHQgZmlsZSANCndyaXRlLnRhYmxlKGRhdGEuZnJhbWUoInNhbXBsZWlkIj1zYW1wbGVfbmFtZXMocGh5c2VxX0tleSksc2FtcGxlX2RhdGEocGh5c2VxX0tleSkpLCJDOlxcVXNlcnNcXGFuZ3VzXFxPbmVEcml2ZSAtIFVOQkNcXEFuZ3VzIEJhbGxcXExhYiB3b3JrXFxCaW9pbmZvcm1hdGljc1xcVUxUUkFcXHBpY3J1c3RcXHNhbXBsZS1tZXRhZGF0YS50eHQiLCBzZXA9Ilx0Iiwgcm93Lm5hbWVzPUZBTFNFLCBjb2wubmFtZXM9VFJVRSwgcXVvdGU9RkFMU0UpDQoNCiNleHBvcnQgdGF4YSB0YWJsZQ0Kd3JpdGUudGFibGUoVEFYQWRmLCAiQzpcXFVzZXJzXFxhbmd1c1xcT25lRHJpdmUgLSBVTkJDXFxBbmd1cyBCYWxsXFxMYWIgd29ya1xcQmlvaW5mb3JtYXRpY3NcXFVMVFJBXFxwaWNydXN0XFx0YXgudHh0IiwgcXVvdGU9RkFMU0UsIGNvbC5uYW1lcz1GQUxTRSwgc2VwPSJcdCIpDQoNCg0KI2V4cG9ydCB0aGUgT1RVIHRhYmxlDQp3cml0ZS50YWJsZShPVFVkZiwgIkM6XFxVc2Vyc1xcYW5ndXNcXE9uZURyaXZlIC0gVU5CQ1xcQW5ndXMgQmFsbFxcTGFiIHdvcmtcXEJpb2luZm9ybWF0aWNzXFxVTFRSQVxccGljcnVzdFxcT1RVLnR4dCIsIHF1b3RlPUZBTFNFLCBjb2wubmFtZXM9VFJVRSwgc2VwPSJcdCIpDQoNCg0KYGBgDQoNCkdvIGludG8gT1RVLnR4dCBhbmQgaW4gdGhlIGZpcnN0IGxpbmUgYXQgdGhlIHZlcnkgYmVnaW5uaW5nIHdyaXRlIE9UVSB0aGVuIGhpdCB0YWIsIGFuZCBzYXZlLiBUaGVzZSBkb2N1bWVudHMgc2hvdWxkIGJlIHJlYWR5IGZvciBwaWNydXN0IQ0KDQoNCg0KDQoNCg0KDQoNCg0K</div>
 
 
 
@@ -2244,7 +1868,7 @@ $(document).ready(function () {
 <!-- code folding -->
 <script>
 $(document).ready(function () {
-  window.initializeSourceEmbed("Importing data from DADA2 via Phyloseq.Rmd");
+  window.initializeSourceEmbed("Creating a tsv file from your phyloseq object.Rmd");
   window.initializeCodeFolding("show" === "show");
 });
 </script>
